@@ -2,8 +2,11 @@ from collections import deque
 from itertools import combinations
 
 from easy_dc.defs import *
+from easy_dc.utils import times
 
 
+
+@times(1000)
 def weave_discocube(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: GLvls) -> Solution:
     """
     Solves the hamiltonian cycle problem in discocube graphs deterministically and in linear time by divide and conquer.
@@ -91,8 +94,8 @@ def weave_discocube(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: 
             yarn = spin(zA)
             warps = split(yarn, bobbins) if bobbins else [yarn]
             for thread in loom:
-                for end in ends:
-                    for ix, warp in enumerate(warps):
+                for ix, warp in enumerate(warps):
+                    for end in ends:
                         if ix not in woven:
                             if thread[end] == warp[0]:
                                 woven.add(ix)
