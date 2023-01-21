@@ -208,7 +208,7 @@ def weave_discocube(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: 
 if __name__ == '__main__':
     from utils import get_G, save_G, stratify_A
 
-    order = 302560
+    order = 908512
     G = get_G(order)
     A, V, VI, E, EA = G['A'], G['V'], G['VI'], G['E'], G['EA']
     G['W'] = W = {n: sum(map(abs, V[n])) for n in A}
