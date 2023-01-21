@@ -2,11 +2,10 @@ from collections import deque
 from itertools import combinations
 
 from easy_dc.defs import *
-from easy_dc.utils import times
+from easy_dc.utils import profile
 
 
-
-@times(1000)
+@profile()
 def weave_discocube(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: GLvls) -> Solution:
     """
     Solves the hamiltonian cycle problem in discocube graphs deterministically and in linear time by divide and conquer.
@@ -169,7 +168,7 @@ def weave_discocube(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: 
 if __name__ == '__main__':
     from utils import get_G, save_G, stratify_A
 
-    order = 2288
+    order = 79040
     G = get_G(order)
     A, V, VI, E, EA = G['A'], G['V'], G['VI'], G['E'], G['EA']
     G['W'] = W = {n: sum(map(abs, V[n])) for n in A}
