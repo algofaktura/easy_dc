@@ -3,12 +3,13 @@
 An algorithm for solving the Hamiltonian cycle problem deterministically and in linear time on all instances of the discocube graphs:
 3-dimensional grid graphs derived from: a polycube of an octahedron | a Hauy construction of an octahedron using cubes as identical building blocks | the accretion of cubes around a central cube which forms an octahedron at the limit...
 
-![Alt text](imgs/planaremb2.png?raw=true "Planar embedding of Cube and Discocubes")
+![Planar embedding of Cube and Discocubes](imgs/planaremb2.png?raw=true "Planar embedding of Cube and Discocubes")
 
 
 I hope to tell the story of the discocube, introduce an undefined graph class *Cubic Accretion Graphs*, some of its properties, and the share insights I've gained by solving this problem having taken an approach similar to that of sculpting the human body...After thousands of studies, drawings, a little math: this is a tiny glimpse into how moving towards a specific aethetic goal yields results. When a graph becomes an artist's muse, how does the artist go about rendering their vision as a painter paints a portrait?
 
-![Alt text](imgs/discocubeviews.png?raw=true "discocubes")
+![Discocubes](imgs/discocubeviews.png?raw=true "Discocubes")
+*Discocubes*
 
 What started as a hack-your-own version of a depth-first-search-with-shortcuts for the discocube graph (solving up to 960 vertices), metastasized into pages of overgrown mixin classes mysteriously coupled to each another like overgrown vines pushing me deeper and deeper into the underbelly of its mutant tentacles. Although it was able to solve instances of over a million vertices, it had the clarity of primordial soup. So, as a sadistic gardener I painstakingly pruned my own unescapable web (all those letters you haven't opened yet?) of thorny vines into presentable tiny bonsai trees. So what is a bonsai if not a tree in intimate scope?
 
@@ -22,13 +23,15 @@ The algorithm presented in this repository is the least complex, also making it 
 Eventually this repository will include other linear time algorithms for solving the hamiltonian cycle problem in 3d grid graphs and also in solid grid graphs, addressing some open issues raised in the graph theory research literature.
 Execution time of each order (in millions):
 
-![Alt text](imgs/hexhoneydiamond.png?raw=true "hexhoneyprismdiamond")
+![Hexprism Honeycomb Diamond](imgs/hexhoneydiamond.png?raw=true "Hexprism Honeycomb Diamond")
+*Hexprism Honeycomb Diamond*
+
 
 ### Running times
 As the order of the graph increases the number of function calls for each nodes goes down to less than 1.5 function calls when profiled using a 
 deterministic profiler. At around 2 million vertices the function call for each node goes down to almost one.
 
-![Alt text](imgs/8-2million.png?raw=true "runtimes of each order")
+![Runtimes of each order](imgs/8-2million.png?raw=true "Runtimes of each order")
 
 ## Installation
 
