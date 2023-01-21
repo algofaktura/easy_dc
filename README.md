@@ -32,7 +32,7 @@ deterministic profiler. At around 2 million vertices the function call for each 
 
 You can install the package by running: 
 ```
-pip install solve_dc
+pip install easy_dc
 ```
 
 ## Usage
@@ -45,17 +45,17 @@ solve(order)
 ## Command line usage
 To use the package via the command line, navigate to the root directory of the project in your terminal and run the following command:
 ```
-python -m solve_dc solve [ORDER]
+python -m easy_dc solve [ORDER]
 ```
 Where [ORDER] is the order of the graph you want to solve. This command will create the graph if it does not already exist, solve the problem, print the time it took to solve the problem, and plot the solution as a 3D line drawing.
 
 You can also pass multiple orders to solve at once by separating them with a space:
 ```
-python -m solve_dc solve 32 80 160 280
+python -m easy_dc solve 32 80 160 280
 ```
 You can also use the '--help' flag to see a list of available orders:
 ```
-python -m solve_dc solve --help
+python -m easy_dc solve --help
 ```
 This will show a list of available orders, which can be used as input when running the solve command.
 
@@ -64,14 +64,14 @@ Note that the first 25 instances, from order 32 to 26208, are already included i
 ## Creating graphs
 To create new graphs, you can use the 'make_graphs' command:
 ```
-python -m solve_dc make_graphs [ORDER] 
+python -m easy_dc make_graphs [ORDER] 
 ```
 Where [ORDER] is the order of the graphs you want to create. The graphs will be saved in the graphs folder within the project directory.
 Upon installation, the package will create 25 problem instances from order 32 to 26208 in the graphs folder. You can solve higher instances but the graphs will have to be produced first.
 
 You can also pass multiple orders to create at once by separating them with a space:
 ```
-python -m solve_dc make_graphs 32 80 280 960
+python -m easy_dc make_graphs 32 80 280 960
 ```
 This command will create 3 graphs of order 32, 80, 280 and 960.
 
@@ -87,7 +87,7 @@ The program will then solve the problem instance, display the time it took and p
 
 You can also use the '--output' flag to specify a custom directory to save the output graphs. For example:
 ```
-python -m solve_dc make_graphs 1373600 --output /path/to/custom/directory
+python -m easy_dc make_graphs 1373600 --output /path/to/custom/directory
 ```
 ## Licensing:
 This package is licensed under the MIT license.

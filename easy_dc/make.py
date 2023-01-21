@@ -115,7 +115,6 @@ def make_edges_adjacency(A: AdjDict, E: Edges) -> EAdj:
     return {frozenset((u, p)): et & {*map(frozenset, product(A[u] - {p}, A[p] - {u}))} for u, p in et}
 
 
-@timed
 def make_coloring(A: AdjDict = None, both: bool = False, oddeven: bool = False) -> Union[Mapping, NodesGroup]:
     """
     Returns a dict mapping a node to its chromatic coloring.
