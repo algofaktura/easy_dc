@@ -219,7 +219,7 @@ def profile(func, dump=None):
             stats.sort_stats("tottime")
             stats.print_stats()
             prim, total = stats.__dict__['prim_calls'], stats.__dict__['total_calls']
-            print(f'⭕️ {ORD}: {prim / total:.2%} primitive of total {total} calls | {round(total / ORD, 2)} calls/n')
+            print(f'⭕️ {ORD}: {prim / total:.2%} primitive of {total} calls | {round(total / ORD, 2)} calls / n')
             if dump:
                 stats.dump_stats(dump)
         return return_value
@@ -243,3 +243,19 @@ def unpack(nested_list) -> Unpacker:
             yield from unpack(nested)
         else:
             yield nested
+
+
+def assemble_cycle(x, y, z, snake):
+    #   REMAP SOLVED TO OTHER LVLS AND WEAVE THEM INTO A CYCLE:
+    prev, joined = [], []
+
+    for ix in range(1, z, 2):
+        #   FOR EVERY PAIR: REVERSE SECOND. EXTEND TO FIRST
+        joined = [s + (x * y) * (ix - 1) for s in snake] + [s + (x * y) * ix for s in reversed(snake)]
+
+        #   NEST PREVIOUS LOOP IN CURRENT LOOP
+        joined[1:1] = prev[-1:] + prev[:-1]
+        prev = joined
+
+    #   RETURN JOINED
+    return joined

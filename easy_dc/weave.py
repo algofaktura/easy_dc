@@ -1,3 +1,33 @@
+"""
+How to weave tapestry.
+
+1.  Spinning the yarn:
+The first step in making a tapestry is to create the yarn that will be used in the weaving process. This can be done by spinning raw fibers such
+as wool or cotton into long, thin strands using a spinning wheel or other tool.
+
+2.  Setting up the loom:
+Once the yarn has been spun, the next step is to set up the loom on which the tapestry will be woven. This typically involves stretching a series
+of parallel threads, called the warp, across the loom, and attaching them to the loom's frame.
+
+3.  Threading the warp:
+Next, the yarn that was spun in step 1 is threaded through the warp threads, starting at the top of the loom and working down to the bottom.
+This process is called threading the warp.
+
+4.  Weaving the weft:
+After the warp has been threaded, the weaver begins the process of weaving the weft, which is the yarn that will be used to create the design
+on the tapestry. This is done by using a shuttle to pass the weft yarn over and under the warp threads, following a predetermined pattern.
+
+5.  Adding the weft:
+The weaver then adds the weft yarn to the loom by passing it over and under the warp threads. The weaver uses a comb to push the weft yarn
+tight against the previous row of weft yarn and to keep the warp threads straight.
+
+6.  Repeating the process:
+The weaver continues to add weft yarn, following the predetermined pattern, until the tapestry is the desired size. The weaver will continue
+to repeat the process of adding weft yarn to the loom until the tapestry is complete.
+
+7.  Removing the tapestry:
+Once the tapestry is complete, it is removed from the loom. The tapestry is then ready to be used or displayed.
+"""
 from collections import deque
 from itertools import combinations
 
@@ -71,7 +101,14 @@ def weave_discocube(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: 
 
     def weave() -> Solution:
         """
-        Interweave weft with warps i.e., join loops together.
+        Weave the weft.
+        len of loom is very small:
+        for a graph with n vertices:
+            n            loops in loom
+            79_040   ->  20
+            273_760  ->  30
+            540_200  ->  37
+            762_272  ->  42
         """
         loom = {idx: Loop(warp) for idx, warp in enumerate(warp_loom())}
         while len(loom) > 1:
@@ -84,7 +121,10 @@ def weave_discocube(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: 
 
     def warp_loom() -> Loom:
         """
-        Place warp threads in loop ie., Warping.
+        Warping.
+        Setting up the loom.
+        Place warp threads in loom.
+        Thread the warp.
         """
         loom = []
         bobbins = None
@@ -168,7 +208,7 @@ def weave_discocube(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: 
 if __name__ == '__main__':
     from utils import get_G, save_G, stratify_A
 
-    order = 79040
+    order = 2027680
     G = get_G(order)
     A, V, VI, E, EA = G['A'], G['V'], G['VI'], G['E'], G['EA']
     G['W'] = W = {n: sum(map(abs, V[n])) for n in A}
