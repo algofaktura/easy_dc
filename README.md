@@ -46,6 +46,7 @@ deterministic profiler. At around 2 million vertices the function call for each 
 I've managed to subdivide the process even further resulting in a function 400% faster: compare solve and solve_np for yourself:
 ![Profile of solve](imgs/profile_solve.png?raw=true "Profile of solve")
 ![Profile of solve_np](imgs/profile_solve_np.png?raw=true "Profile of solve_np")
+![Profile of solve_np](imgs/profile_solve_np2.png?raw=true "Profile of solve_np")
 
 ## Installation
 

@@ -174,7 +174,7 @@ def weave_discocube(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: 
         """
         return [VI[(*xy, zlevel)] for xy in (red_yarn if zlevel in red else blue_yarn)[-len(zA):]]
 
-    def assign_colors():
+    def color_levels():
         """
         unzip a list into two lists
         first list has the highest value: which is the level from which to to add to the z value
@@ -226,7 +226,7 @@ def weave_discocube(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: 
         return bobbins
 
     ends: Ends = 0, -1
-    red, blue = assign_colors()
+    red, blue = color_levels()
     red_yarn, blue_yarn = color_yarn()
     return weave()
 
@@ -234,7 +234,7 @@ def weave_discocube(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: 
 if __name__ == '__main__':
     from utils import get_G, save_G, stratify_A, id_seq
 
-    order = 908512
+    order = 1373600
     G = get_G(order)
     A, V, VI, E, EA = G['A'], G['V'], G['VI'], G['E'], G['EA']
     G['W'] = W = {n: sum(map(abs, V[n])) for n in A}
