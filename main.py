@@ -2,7 +2,7 @@ import argparse
 import time
 
 from easy_dc.utils import get_G
-from easy_dc.solve import weave_discocube
+from easy_dc.weave import weave_discocube
 
 
 parser = argparse.ArgumentParser(description='Welcome to solve_dc package! Installing this package created the first 25 instances, from order 32 to 26208. You can solve higher instances but the graphs will have to be produced first.')

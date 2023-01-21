@@ -48,7 +48,8 @@ def make_vertices(ORD: int) -> Verts:
     BV: BasisVectors = basis_vectors()
     ORD_N = {order: n + 1 for n, order in enumerate(uon(8, 3_000_000))}
     stages = {k: set() if k else {OGN} for k in range(ORD_N[ORD])}
-    for lvl in range(1, ORD_N[ORD]): stages[lvl] = {(Xy(vec) + xyz).data for vec in stages[lvl - 1] for xyz in BV}
+    for lvl in range(1, ORD_N[ORD]):
+        stages[lvl] = {(Xy(vec) + xyz).data for vec in stages[lvl - 1] for xyz in BV}
     V = (p for ve in (tuple(tuple(c) for c in make_cube(p)) for p in set((tuple(v) for vc in list(stages.values()) for v in vc))) for p in ve)
     return sorted(set(V), key=lambda x: (edist(x), x[0], x[1], x[2]))
 

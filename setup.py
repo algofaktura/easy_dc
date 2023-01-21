@@ -38,7 +38,7 @@ setup(
     entry_points={
         'console_scripts': [
             'easy_dc = easy_dc.__main__:main',
-            'easy_dc-solve=easy_dc.easy_dc:solve'
+            'easy_dc-solve=easy_dc.weave:weave_discocube'
         ]
     },
     zip_safe=False,
