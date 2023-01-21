@@ -91,3 +91,6 @@ python -m easy_dc make_graphs 1373600 --output /path/to/custom/directory
 ```
 ## Licensing:
 This package is licensed under the MIT license.
+
+
+![Alt text](imgs/dc960.JPG?raw=true "runtimes of each order")

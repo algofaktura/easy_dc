@@ -189,8 +189,8 @@ def weave_discocube(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: 
     def set_bobbins(loom: Loom) -> NodeSet:
         """
         returns a set of bobbins. it sets the bobbins for the next level by adding the upper and lower neighbors of the first and last element
-        of each thread in the loom attribute. The method iterates over the loom attribute and for each thread in loom it adds the upper and lower
-        neighbors of the first and last element respectively, to the bobbins set.
+        of each thread in the loom. The method iterates over the threads in the loom and adds the upper and lower
+        neighbors of the first and last element respectively, to the bobbins set and to the ends of the thread.
         """
         bobbins: NodeSet = set()
         for thread in loom:
