@@ -31,6 +31,8 @@ Once the tapestry is complete, it is removed from the loom. The tapestry is then
 from collections import deque
 from itertools import combinations
 
+import numpy as np
+
 from easy_dc.defs import *
 from easy_dc.utils import profile
 
@@ -52,8 +54,6 @@ def weave_discocube(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: 
     Weights = Dict[int, Union[int, float]]: Weights for each node based on their accretion level.
     GLvls = Dict[int, Dict[str, Any]]: The adjacency dictionary partitioned according to their x value, so that they are planes of x, y.
     """
-
-    ends: Ends = 0, -1
 
     class Loop:
         """
@@ -130,7 +130,7 @@ def weave_discocube(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: 
         bobbins = None
         for z, zA in ZA.items():
             woven = set()
-            yarn = spin(zA)
+            yarn = get_yarn(z, zA)
             warps = split(yarn, bobbins) if bobbins else [yarn]
             for thread in loom:
                 for ix, warp in enumerate(warps):
@@ -157,6 +157,29 @@ def weave_discocube(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: 
         for _ in range(warp_length):
             spool.append(sorted(zA[spool[-1]] - {*spool}, key=lambda n: W[n])[-1])
         return spool
+
+    def color_yarn():
+        """
+        Get colored yarns for weaving.
+        """
+        return (red := [V[node][:2] for node in spin(ZA[-1])]), np.add(np.dot(np.array(red), np.array([[-1, 0], [0, -1]]))[-len(ZA[-3]):], [0, 2])
+
+    def get_yarn(zlevel, zA):
+        """
+        Get the yarn from the spool
+        returns generator.
+        yarn color will have to be passed in by the caller, so it must know.. or should i have a map so i can find out what?
+
+        I need to know which rotation this level belongs.
+        """
+        return [VI[(*xy, zlevel)] for xy in (red_yarn if zlevel in red else blue_yarn)[-len(zA):]]
+
+    def assign_colors():
+        """
+        unzip a list into two lists
+        first list has the highest value: which is the level from which to to add to the z value
+        """
+        return (to_color := list(reversed(ZA)))[::2], to_color[1::2]
 
     def split(tour: Path, subset: NodeSet) -> Paths:
         """
@@ -202,18 +225,23 @@ def weave_discocube(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: 
                     thread.append(upper)
         return bobbins
 
+    ends: Ends = 0, -1
+    red, blue = assign_colors()
+    red_yarn, blue_yarn = color_yarn()
     return weave()
 
 
 if __name__ == '__main__':
-    from utils import get_G, save_G, stratify_A
+    from utils import get_G, save_G, stratify_A, id_seq
 
-    order = 302560
+    order = 908512
     G = get_G(order)
     A, V, VI, E, EA = G['A'], G['V'], G['VI'], G['E'], G['EA']
     G['W'] = W = {n: sum(map(abs, V[n])) for n in A}
     G['ZA'] = ZA = stratify_A(A, V)
+    lst = list(reversed(ZA.keys()))
     save_G(G)
     print("solving order ", order)
-    weave_discocube(A, V, VI, EA, W, ZA)
-
+    woven = weave_discocube(A, V, VI, EA, W, ZA)
+    print(f'⭕️ {order}')
+    print('💰', len(woven), id_seq(woven, A))
