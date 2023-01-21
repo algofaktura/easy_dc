@@ -113,3 +113,5 @@ This package is licensed under the MIT license.
 
 
 ![Alt text](imgs/dc960.JPG?raw=true "A Discocube with 960 vertices")
+
+Happy reading!
