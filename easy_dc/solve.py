@@ -205,14 +205,37 @@ def weave_discocube(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: 
     return weave()
 
 
+def unzip(to_unzip):
+    """
+    unzip a list into two lists
+    first list has the highest value: which is the level from which to to add to the z value
+    """
+    return to_unzip[::2], to_unzip[1::2]
+
+
+def get_node(xy, z_level, VI):
+    """
+    Get node an complete with z
+    """
+    return VI[(*xy, z_level)]
+
+
+def cut_yarn(yarn, zA):
+    """
+    Process of cutting the yarn to size for the level
+    """
+    return yarn[-len(zA):]
+
 if __name__ == '__main__':
     from utils import get_G, save_G, stratify_A
 
-    order = 2997280
+    order = 79040
     G = get_G(order)
     A, V, VI, E, EA = G['A'], G['V'], G['VI'], G['E'], G['EA']
     G['W'] = W = {n: sum(map(abs, V[n])) for n in A}
     G['ZA'] = ZA = stratify_A(A, V)
+    lst = list(ZA.keys())
+    print(lst[::2], lst[1::2])
     save_G(G)
     print("solving order ", order)
     weave_discocube(A, V, VI, EA, W, ZA)
