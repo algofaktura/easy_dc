@@ -179,7 +179,7 @@ def weave_discocube(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: 
         unzip a list into two lists
         first list has the highest value: which is the level from which to to add to the z value
         """
-        return (to_color := list(reversed(ZA)))[::2], to_color[1::2]
+        return (revZA := list(reversed(ZA)))[::2], revZA[1::2]
 
     def split(tour: Path, subset: NodeSet) -> Paths:
         """
