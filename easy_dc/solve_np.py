@@ -28,20 +28,22 @@ to repeat the process of adding weft yarn to the loom until the tapestry is comp
 7.  Removing the tapestry:
 Once the tapestry is complete, it is removed from the loom. The tapestry is then ready to be used or displayed.
 """
-import itertools
 from collections import deque
-from itertools import combinations
+from itertools import combinations, pairwise
 
 import numpy as np
 
 from easy_dc.defs import *
-from easy_dc.utils import profile
+from easy_dc.utils import profile, times # noqa
 
 
-@profile()
+@times(100)
 def weave_discocube(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: GLvls) -> Solution:
     """
-    Solves the hamiltonian cycle problem in discocube graphs deterministically and in linear time by divide and conquer.
+    Solves the hamiltonian cycle problem in discocube graphs deterministically and in linear time by divide and conquer. Uses the weaving process as a metaphor for the algorithmic design and process.
+    1. Spin yarn: create an initial hamiltonian path from the node furthest from the origin to the origin
+    2. assign colors: each level get's it's own color.
+    3. color yarn: each level alternates in color from red to blue. The blue yarn is a 180 rotation around the z-axis and a unit length displacement in the y direction.
 
     As the size of the input grows, the time it takes to solve the problem increases by a factor proportional to the input.
     The function weave takes as input an Adjacency dictionary A, a set of vertices V and an index map VI and a weights W.
@@ -71,7 +73,7 @@ def weave_discocube(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: 
             The current loop represented as a set of frozensets of edges.
             [0, 1, 2, 3] -> {frozenset([0, 1]), frozenset([1, 2]), frozenset([2, 3]), frozenset([3, 0])}
             """
-            return {frozenset(edge) for edge in itertools.pairwise(self.loop + self.loop[:1])}
+            return {frozenset(edge) for edge in pairwise(self.loop + self.loop[:1])}
 
         @property
         def eadjs(self) -> FrozenEdges:
@@ -86,7 +88,7 @@ def weave_discocube(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: 
             """
             self.rotate_to_edge(*edge)
             other.rotate_to_edge(*(oedge if oedge[0] in A[edge[-1]] else oedge[::-1]))
-            self.loop += other.loop
+            self.loop[len(self.loop):] = other.loop
 
         def rotate_to_edge(self, start: int, end: int):
             """
@@ -132,7 +134,7 @@ def weave_discocube(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: 
         for z, zA in ZA.items():
             woven = set()
             yarn = get_yarn(z, zA)
-            warps = split(yarn, bobbins) if bobbins else [yarn]
+            warps = cut(yarn, bobbins) if bobbins else [yarn]
             for thread in loom:
                 for ix, warp in enumerate(warps):
                     for end in ends:
@@ -149,6 +151,13 @@ def weave_discocube(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: 
             w += [VI[(vector := V[node])[0], vector[1], -vector[2]] for node in reversed(w)]
         return sorted(loom)
 
+    def assign_colors():
+        """
+        unzip a list into two lists
+        first list has the highest value: which is the level from which to to add to the z value
+        """
+        return (revZA := list(reversed(ZA)))[::2], revZA[1::2]
+
     def spin(zA: AdjDict) -> Path:
         """
         If the start node is either the centermost or the outermost node, it can walk all paths without backtracking.
@@ -159,11 +168,11 @@ def weave_discocube(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: 
             spool.append(sorted(zA[spool[-1]] - {*spool}, key=lambda n: W[n])[-1])
         return spool
 
-    def color_yarn():
+    def dye(yarn=None):
         """
         Get colored yarns for weaving.
         """
-        return (red := [V[node][:2] for node in spin(ZA[-1])]), np.add(np.dot(np.array(red), np.array([[-1, 0], [0, -1]]))[-len(ZA[-3]):], [0, 2])
+        return (red := [V[node][:2] for node in yarn]), np.add(np.dot(np.array(red), [[-1, 0], [0, -1]])[-len(ZA[-3]):], [0, 2])
 
     def get_yarn(zlevel, zA):
         """
@@ -175,14 +184,7 @@ def weave_discocube(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: 
         """
         return [VI[(*xy, zlevel)] for xy in (red_yarn if zlevel in red else blue_yarn)[-len(zA):]]
 
-    def color_levels():
-        """
-        unzip a list into two lists
-        first list has the highest value: which is the level from which to to add to the z value
-        """
-        return (revZA := list(reversed(ZA)))[::2], revZA[1::2]
-
-    def split(tour: Path, subset: NodeSet) -> Paths:
+    def cut(tour: Path, subset: NodeSet) -> Paths:
         """
         Given a set S of integers representing a tour, and a subset T of S, the goal is to partition the tour
         into the least number of subtours such that the length of each subtour is longer than 2 unless the subtour consists of
@@ -227,15 +229,15 @@ def weave_discocube(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: 
         return bobbins
 
     ends: Ends = 0, -1
-    red, blue = color_levels()
-    red_yarn, blue_yarn = color_yarn()
+    red, blue = assign_colors()
+    red_yarn, blue_yarn = dye(yarn=spin(ZA[-1]))
     return weave()
 
 
 if __name__ == '__main__':
     from utils import get_G, save_G, stratify_A, id_seq, uon
 
-    for order in uon(2027680, 2027680):
+    for order in uon(9120, 9120):
         # order = 2997280
         G = get_G(order)
         A, V, VI, E, EA = G['A'], G['V'], G['VI'], G['E'], G['EA']
