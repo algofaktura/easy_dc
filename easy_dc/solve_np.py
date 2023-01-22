@@ -232,16 +232,17 @@ def weave_discocube(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: 
 
 
 if __name__ == '__main__':
-    from utils import get_G, save_G, stratify_A, id_seq
+    from utils import get_G, save_G, stratify_A, id_seq, uon
 
-    order = 1373600
-    G = get_G(order)
-    A, V, VI, E, EA = G['A'], G['V'], G['VI'], G['E'], G['EA']
-    G['W'] = W = {n: sum(map(abs, V[n])) for n in A}
-    G['ZA'] = ZA = stratify_A(A, V)
-    lst = list(reversed(ZA.keys()))
-    save_G(G)
-    print("solving order ", order)
-    woven = weave_discocube(A, V, VI, EA, W, ZA)
-    print(f'⭕️ {order}')
-    print('💰', len(woven), id_seq(woven, A))
+    for order in uon(32, 1373600):
+        # order = 2997280
+        G = get_G(order)
+        A, V, VI, E, EA = G['A'], G['V'], G['VI'], G['E'], G['EA']
+        G['W'] = W = {n: sum(map(abs, V[n])) for n in A}
+        G['ZA'] = ZA = stratify_A(A, V)
+        lst = list(reversed(ZA.keys()))
+        save_G(G)
+        print("solving order ", order)
+        woven = weave_discocube(A, V, VI, EA, W, ZA)
+        print(f'⭕️ {order}')
+        print('💰', len(woven), id_seq(woven, A))
