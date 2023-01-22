@@ -85,7 +85,7 @@ def weave_discocube(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: 
             """
             self.rotate_to_edge(*edge)
             other.rotate_to_edge(*(oedge if oedge[0] in A[edge[-1]] else oedge[::-1]))
-            self.loop.extend(other.loop)
+            self.loop += other.loop
 
         def rotate_to_edge(self, start: int, end: int):
             """
@@ -191,22 +191,22 @@ def weave_discocube(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: 
         subtours, prev = [], -1
         last_idx = len(tour) - 1
         while (ixs := sorted((tour.index(node) for node in subset)))[-1] == last_idx and ixs[-2] == ixs[-1] - 1:
-            subtours.append(tour[-2:])
+            subtours += [tour[-2:]]
             tour[-2:], ixs[-2:] = [], []
         for e, ix in enumerate(ixs):
             if e == len(ixs) - 1 and ix != last_idx:
                 if len(t1 := tour[prev + 1: ix]) > 1 or not t1:
-                    subtours.extend((t1, tour[ix:]))
+                    subtours += (t1, tour[ix:])
                 else:
-                    subtours.append(tour[prev + 1: ix + 1])
+                    subtours += [tour[prev + 1: ix + 1]]
                 prev = None
             else:
-                subtours.append(tour[prev + 1:ix + 1])
+                subtours += [tour[prev + 1:ix + 1]]
                 prev = ix
             if prev is None:
                 break
         if prev and (rest := tour[max(ixs) + 1:]):
-            subtours.append(rest)
+            subtours += [rest]
         return [tour if tour[0] in subset else tour[::-1] for tour in subtours if tour]
 
     def set_bobbins(loom: Loom) -> NodeSet:
@@ -234,7 +234,7 @@ def weave_discocube(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: 
 if __name__ == '__main__':
     from utils import get_G, save_G, stratify_A, id_seq, uon
 
-    for order in uon(32, 1373600):
+    for order in uon(632632, 632632):
         # order = 2997280
         G = get_G(order)
         A, V, VI, E, EA = G['A'], G['V'], G['VI'], G['E'], G['EA']
