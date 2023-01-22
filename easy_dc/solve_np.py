@@ -28,6 +28,7 @@ to repeat the process of adding weft yarn to the loom until the tapestry is comp
 7.  Removing the tapestry:
 Once the tapestry is complete, it is removed from the loom. The tapestry is then ready to be used or displayed.
 """
+import itertools
 from collections import deque
 from itertools import combinations
 
@@ -70,7 +71,7 @@ def weave_discocube(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: 
             The current loop represented as a set of frozensets of edges.
             [0, 1, 2, 3] -> {frozenset([0, 1]), frozenset([1, 2]), frozenset([2, 3]), frozenset([3, 0])}
             """
-            return {frozenset(edge) for edge in zip(self.loop, self.loop[1:] + self.loop[:1])}
+            return {frozenset(edge) for edge in itertools.pairwise(self.loop + self.loop[:1])}
 
         @property
         def eadjs(self) -> FrozenEdges:
@@ -145,7 +146,7 @@ def weave_discocube(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: 
             loom.extend((deque(warp) for warp in (w for ix, w in enumerate(warps) if ix not in woven)))
             bobbins = {*set_bobbins(loom)} if z != -1 else None
         for w in loom:
-            w.extend([VI[(vector := V[node])[0], vector[1], -vector[2]] for node in reversed(w)])
+            w += [VI[(vector := V[node])[0], vector[1], -vector[2]] for node in reversed(w)]
         return sorted(loom)
 
     def spin(zA: AdjDict) -> Path:
@@ -234,7 +235,7 @@ def weave_discocube(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: 
 if __name__ == '__main__':
     from utils import get_G, save_G, stratify_A, id_seq, uon
 
-    for order in uon(632632, 632632):
+    for order in uon(2027680, 2027680):
         # order = 2997280
         G = get_G(order)
         A, V, VI, E, EA = G['A'], G['V'], G['VI'], G['E'], G['EA']
