@@ -2,7 +2,6 @@
 
 An algorithm for solving the Hamiltonian cycle problem deterministically and in linear time on all instances of the discocube graphs:
 3-dimensional grid graphs derived from: a polycube of an octahedron | a Hauy construction of an octahedron using cubes as identical building blocks | the accretion of cubes around a central cube forming an octahedron at the limit...
-A vector version is coming which should resolve some bottlenecks I've identified. It's all about subdividing the problem into mini problems which can then be mapped.
 
 Finding the solution to the problem reminded me of macramé, of tying knots, weaving and how repeating certain movements resulted in certain patterns. So there must be a 'weave' I could use to expose underlying unit structure and repeat this throughout. 
 The focus of this work is to apply all that I know about this graph, not as a discrete mathematician, but as an artists with an eye towards visual aesthetics. Inspiration was the driving force behind the work (a bit of obsession I confess). How is the result
