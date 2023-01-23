@@ -1,21 +1,50 @@
 """
 How to weave tapestry.
 
-1.  Spinning the yarn:
-The first step in making a tapestry is to create the yarn that will be used in the weaving process. This can be done by spinning raw fibers such
-as wool or cotton into long, thin strands using a spinning wheel or other tool.
+I: Spinning the yarn, coloring the yarn, assigning colors:
+    A.  Spinning the yarn:
+    The first step in making a tapestry is to create the yarn that will be used in the weaving process. This can be done by spinning raw fibers such as wool or cotton into long, thin strands using a spinning wheel or other tool.
 
-2.  Setting up the loom:
-Once the yarn has been spun, the next step is to set up the loom on which the tapestry will be woven. This typically involves stretching a series
+    spin() -> yarn: walk a hamiltonian circuit starting from the node furthest from origin to towards the node closest to origin. One should find the hamiltonian path from the largest level in order to produce the longest piece of yarm. If the initial tour came from the least nodes: ie., min(vector[2]) it would result in only a tour with four nodes, which is useless in creating other tours.
+
+    B. Coloring the yarn:
+    Colors are chosen for the yarn based on a target image.
+    Every level can't use the same subtour as the order of the solution applies only to alternating levels. If the inital solution were found from the zlevel closest to origin, which is -1: The yarn produced from spin() applies only to zlevel: -5, -9, -13. We will call this yarn red.
+
+
+    dye(yarn) -> red_yarn, blue_yarn:
+        red_yarn is the original yarn produced, without rotations.
+        blue_yarn is the red_yarn rotated 180 degrees around the z-axis and displaced one unit length along the y-axis.
+
+    How to create the blue yarn?
+    The yarn the other zlevels use can be calculated from the red yarn by rotating the vectors 180 degrees around the z-axis and then moving them i
+    unit length along the y-axis. This will be the blue yarn.
+
+    C. Assigning a color to each level:
+    Each level is assigned to an alternating color, either red or blue. The levels corresponding to red are stored in red, and those corresponding to
+    blue are stored in blue:
+    assign_colors() -> red, blue:
+
+        red: [-1, -5, -9, -13, -17, -21, -25, -29, ...]
+        blue: [-3, -7, -11, -15, -19, -23, -27, -31, ...]
+
+
+2.  Setting up the loom and threading the warp:
+    Once the yarn has been spun, the next step is to set up the loom on which the tapestry will be woven. This typically involves stretching a series
 of parallel threads, called the warp, across the loom, and attaching them to the loom's frame.
 
-3.  Threading the warp:
-Next, the yarn that was spun in step 1 is threaded through the warp threads, starting at the top of the loom and working down to the bottom.
-This process is called threading the warp.
 
-4.  Weaving the weft:
+    Next, the yarn that was spun in step 1 is threaded through the warp threads, starting at the top of the loom and working down to the bottom.
+This process is called threading the warp.
+    warp_loom() -> loom:
+        returns a loom with the warps fastenened to the loom requiring only that they be interleaved with the weft:
+
+
+3.  Weaving the weft:
 After the warp has been threaded, the weaver begins the process of weaving the weft, which is the yarn that will be used to create the design
 on the tapestry. This is done by using a shuttle to pass the weft yarn over and under the warp threads, following a predetermined pattern.
+
+    weave() -> Tapestry
 
 5.  Adding the weft:
 The weaver then adds the weft yarn to the loom by passing it over and under the warp threads. The weaver uses a comb to push the weft yarn
@@ -28,8 +57,9 @@ to repeat the process of adding weft yarn to the loom until the tapestry is comp
 7.  Removing the tapestry:
 Once the tapestry is complete, it is removed from the loom. The tapestry is then ready to be used or displayed.
 """
+import time
 from collections import deque
-from itertools import combinations, pairwise
+from itertools import combinations, pairwise, cycle
 
 import numpy as np
 
@@ -37,13 +67,14 @@ from easy_dc.defs import *
 from easy_dc.utils import profile, times # noqa
 
 
-@times(100)
 def weave_discocube(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: GLvls) -> Solution:
     """
-    Solves the hamiltonian cycle problem in discocube graphs deterministically and in linear time by divide and conquer. Uses the weaving process as a metaphor for the algorithmic design and process.
+    Solves the hamiltonian cycle problem in discocube graphs deterministically and in linear time by divide and conquer. Uses the weaving process as
+    a metaphor for the algorithmic design and process.
     1. Spin yarn: create an initial hamiltonian path from the node furthest from the origin to the origin
     2. assign colors: each level get's it's own color.
-    3. color yarn: each level alternates in color from red to blue. The blue yarn is a 180 rotation around the z-axis and a unit length displacement in the y direction.
+    3. color yarn: each level alternates in color from red to blue. The blue yarn is a 180 rotation around the z-axis and a unit length displacement
+    in the y direction.
 
     As the size of the input grows, the time it takes to solve the problem increases by a factor proportional to the input.
     The function weave takes as input an Adjacency dictionary A, a set of vertices V and an index map VI and a weights W.
@@ -113,7 +144,7 @@ def weave_discocube(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: 
             540_200  ->  37
             762_272  ->  42
         """
-        loom = {idx: Loop(warp) for idx, warp in enumerate(warp_loom())}
+        loom = warp_loom()
         while len(loom) > 1:
             for ix_warp, ix_weft in combinations(loom.keys(), 2):
                 if bridge := (warp := loom[ix_warp]).edges & (weft := loom[ix_weft]).eadjs:
@@ -122,7 +153,7 @@ def weave_discocube(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: 
                         break
         return loom[0].loop
 
-    def warp_loom() -> Loom:
+    def warp_loom() -> WarpedLoom:
         """
         Warping.
         Setting up the loom.
@@ -133,7 +164,7 @@ def weave_discocube(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: 
         bobbins = None
         for z, zA in ZA.items():
             woven = set()
-            yarn = get_yarn(z, zA)
+            yarn = get_yarn(zlevel=z, size=len(zA))
             warps = cut(yarn, bobbins) if bobbins else [yarn]
             for thread in loom:
                 for ix, warp in enumerate(warps):
@@ -146,21 +177,20 @@ def weave_discocube(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: 
                                 else:
                                     thread.extendleft(warp[1:])
             loom.extend((deque(warp) for warp in (w for ix, w in enumerate(warps) if ix not in woven)))
-            bobbins = {*set_bobbins(loom)} if z != -1 else None
+            bobbins = {*wind_bobbins(loom)} if z != -1 else None
         for w in loom:
             w += [VI[(vector := V[node])[0], vector[1], -vector[2]] for node in reversed(w)]
-        return sorted(loom)
-
-    def assign_colors():
-        """
-        unzip a list into two lists
-        first list has the highest value: which is the level from which to to add to the z value
-        """
-        return (revZA := list(reversed(ZA)))[::2], revZA[1::2]
+        return {idx: Loop(warp) for idx, warp in enumerate(sorted(loom))}
 
     def spin(zA: AdjDict) -> Path:
         """
-        If the start node is either the centermost or the outermost node, it can walk all paths without backtracking.
+        Walk a hamiltonian circuit starting from the node furthest from origin to towards the node closest to origin without backtracking by using
+        the calculating the attrition factor and ordering the next steps accordingly. When calculating this factor, if the start node is either the
+        centermost or the outermost node, it can walk all paths without backtracking.
+
+        spin() -> yarn: walk a hamiltonian circuit starting from the node furthest from origin to towards the node closest to origin. One should find
+        the hamiltonian path from the largest level in order to produce the longest piece of yarm. If the initial tour came from the least nodes ie.,
+        min(vector[2]) it would result in only a tour with four nodes, which is useless in creating other tours.
         """
         spool = [max(zA)]
         warp_length = len(zA) - 1
@@ -168,21 +198,19 @@ def weave_discocube(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: 
             spool.append(sorted(zA[spool[-1]] - {*spool}, key=lambda n: W[n])[-1])
         return spool
 
-    def dye(yarn=None):
+    def dye(yarn=None) -> Yarn_Spool:
         """
         Get colored yarns for weaving.
         """
-        return (red := [V[node][:2] for node in yarn]), np.add(np.dot(np.array(red), [[-1, 0], [0, -1]])[-len(ZA[-3]):], [0, 2])
+        red = [V[node][:2] for node in yarn]
+        blue = np.add(np.dot(np.array(red), [[-1, 0], [0, -1]])[-len(ZA[-3]):], [0, 2])
+        return cycle((red, blue) if min(ZA) % 4 == 3 else (blue, red))
 
-    def get_yarn(zlevel, zA):
+    def get_yarn(zlevel=None, size=None) -> Path:
         """
         Get the yarn from the spool
-        returns generator.
-        yarn color will have to be passed in by the caller, so it must know.. or should i have a map so i can find out what?
-
-        I need to know which rotation this level belongs.
         """
-        return [VI[(*xy, zlevel)] for xy in (red_yarn if zlevel in red else blue_yarn)[-len(zA):]]
+        return [VI[(*xy, zlevel)] for xy in next(colored_yarn)[-size:]]
 
     def cut(tour: Path, subset: NodeSet) -> Paths:
         """
@@ -212,7 +240,7 @@ def weave_discocube(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: 
             subtours += [rest]
         return [tour if tour[0] in subset else tour[::-1] for tour in subtours if tour]
 
-    def set_bobbins(loom: Loom) -> NodeSet:
+    def wind_bobbins(loom: Loom) -> NodeSet:
         """
         returns a set of bobbins. it sets the bobbins for the next level by adding the upper and lower neighbors of the first and last element
         of each thread in the loom. The method iterates over the threads in the loom and adds the upper and lower
@@ -229,23 +257,36 @@ def weave_discocube(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: 
         return bobbins
 
     ends: Ends = 0, -1
-    red, blue = assign_colors()
-    red_yarn, blue_yarn = dye(yarn=spin(ZA[-1]))
+    colored_yarn = dye(yarn=spin(ZA[-1]))
     return weave()
 
 
 if __name__ == '__main__':
     from utils import get_G, save_G, stratify_A, id_seq, uon
-
-    for order in uon(9120, 9120):
-        # order = 2997280
+    orders = list(uon(80, 100000))
+    all_times = []
+    for order in uon(80, 100000):
         G = get_G(order)
         A, V, VI, E, EA = G['A'], G['V'], G['VI'], G['E'], G['EA']
-        G['W'] = W = {n: sum(map(abs, V[n])) for n in A}
-        G['ZA'] = ZA = stratify_A(A, V)
-        lst = list(reversed(ZA.keys()))
-        save_G(G)
-        print("solving order ", order)
-        woven = weave_discocube(A, V, VI, EA, W, ZA)
-        print(f'⭕️ {order}')
-        print('💰', len(woven), id_seq(woven, A))
+        if 'W' not in G or 'ZA' not in G:
+            G['W'] = W = {n: sum(map(abs, V[n])) for n in A}
+            G['ZA'] = ZA = stratify_A(A, V)
+        W = G['W']
+        ZA = G['ZA']
+        if len(A) != order:
+            print(f'ORD {len(A)} BUT IS UNDER WRONG FILE {order}')
+            save_G(G)
+        order = len(A)
+        ord_times = []
+        woven = None
+        for _ in range(20):
+            start = time.time()
+            woven = weave_discocube(A, V, VI, EA, W, ZA)
+            dur = time.time() - start
+            ord_times.append(dur)
+
+        all_times.append(min(ord_times))
+
+        print(f'⭕️ {order} | ⏱️ {all_times[-1]} | "🩺", {len(woven)}/{order}: {id_seq(woven, A)}')
+    print(f'orders = {orders}')
+    print(f'all_times = {all_times}')

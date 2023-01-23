@@ -114,7 +114,7 @@ def save_G(G):
     """
     Get DC graph.
     """
-    return picklesave(G, os.path.join(FP_GRAPHS, str(G['ORD'])))
+    return picklesave(G, os.path.join(FP_GRAPHS, str(len(G['A']))))
 
 
 def stratify_A(A: AdjDict, V: Verts) -> GLvls:

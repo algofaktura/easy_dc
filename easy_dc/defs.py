@@ -1,3 +1,4 @@
+import itertools
 from typing import (
     Any,
     Dict,
@@ -12,12 +13,15 @@ from typing import (
     Generator,
     Iterator,
 )
+
+import numpy as np
+
 from easy_dc.xyz import Xy
 
 """
 Filepaths to be replaced with nonmanual
 """
-FP_GRAPHS = "/mnt/a9f6bede-6105-4049-a22d-aeb740b1e684/dcgraphs"
+FP_GRAPHS = "/mnt/a9f6bede-6105-4049-a22d-aeb740b1e684/graphs_discocube"
 
 """
 TYPE DEFINITIONS
@@ -50,8 +54,12 @@ BasisVectors = List[Xy]
 AxisRotations = Dict[str, Dict[str, Xy]]
 Certificate = str or bool
 Loom = List[Warp]
+WarpedLoom = Dict[int, Any]
 Solution = List[int]
 FrozenEdges = Set[FrozenSet[int]]
+ColoredYarn = Union[List[List[int]], np.ndarray]
+Yarn_Spool = itertools.cycle[ColoredYarn]
+
 
 __all__ = [
     'AdjDict',
@@ -60,6 +68,7 @@ __all__ = [
     'AxisVectors',
     'BasisVectors',
     'Certificate',
+    'ColoredYarn',
     'Cycle',
     'Edges',
     'EAdj',
@@ -87,5 +96,7 @@ __all__ = [
     'Verts',
     'Vector',
     'Warp',
+    'WarpedLoom',
     'Weights',
+    'Yarn_Spool'
 ]
