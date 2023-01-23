@@ -68,6 +68,7 @@ from easy_dc.defs import *
 from easy_dc.utils import profile, times # noqa
 
 
+# @profile()
 def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: GLvls) -> Solution:
     """
     Solves the hamiltonian cycle problem in discocube graphs deterministically using divide and conquer (non-recursive) and in linear time (the time it takes grows to solve the problem grows linearly to the size of the input) . Uses the weaving process as inspiration and metaphor for the algorithmic design and process.
@@ -87,6 +88,8 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
     Weights = Dict[int, Union[int, float]]: Weights for each node based on their accretion level.
     GLvls = Dict[int, Dict[str, Any]]: The adjacency dictionary partitioned according to their x value, so that they are planes of x, y.
     """
+    ends: Ends = 0, -1
+
     class Loop:
         """
         Simple loop class with an edges property: the sequence as a set of edges, or
@@ -158,16 +161,17 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
         Place warp threads in loom.
         Thread the warp.
         """
-        loom = []
         bobbins = None
+        yarn, warps, loom = [], [], []
+        rb_yarn = {3: (red := [V[node][:2] for node in spin(ZA[-1])]), 1: np.add(np.dot(np.array(red), [[-1, 0], [0, -1]])[-len(ZA[-3]):], [0, 2])}
         for z, zA in ZA.items():
             woven = set()
-            yarn = get_yarn(zlevel=z, size=len(zA))
-            warps = cut(yarn, bobbins) if bobbins else [yarn]
+            yarn[:] = [VI[(*xy, z)] for xy in rb_yarn[z % 4][-len(zA):]]
+            warps[:] = cut(yarn, bobbins) if bobbins else [yarn]
             for thread in loom:
                 for ix, warp in enumerate(warps):
-                    for end in ends:
-                        if ix not in woven:
+                    if ix not in woven:
+                        for end in ends:
                             if thread[end] == warp[0]:
                                 woven.add(ix)
                                 if end:
@@ -196,34 +200,43 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
             spool.append(sorted(zA[spool[-1]] - {*spool}, key=lambda n: W[n])[-1])
         return spool
 
-    def dye(yarn=None) -> Yarn_Spool:
-        """
-        Get colored yarns for weaving.
-        """
-        return {
-            'RED': (red := [V[node][:2] for node in yarn]),
-            'BLUE': np.add(np.dot(np.array(red), [[-1, 0], [0, -1]])[-len(ZA[-3]):], [0, 2])
-        }
-
-    def get_yarn(zlevel=None, size=None) -> Path:
-        """
-        Get the yarn from the spool
-        """
-        return [VI[(*xy, zlevel)] for xy in colored_yarn['RED' if zlevel % 4 == 3 else 'BLUE'][-size:]]
-
     def cut(tour: Path, subset: NodeSet) -> Paths:
         """
         Given a set S of integers representing a tour, and a subset T of S, the goal is to partition the tour
         into the least number of subtours such that the length of each subtour is longer than 2 unless the subtour consists of
         a node from the subset. At least one node from the subset (if there are more than subset node in the subtour)
         in the subtour is in the first index (as a result of reversing the sequence) to facilitate extending to the loom threads.
+
+        number of bobbins increases by 2 as the level grows:
+        ixs = sorted((tour.index(node) for node in subset))
+        print(ixs):
+                    [8, 11]
+                    [14, 19]
+                    [20, 25, 27, 36]
+                    [26, 33, 35, 48, 55, 56]
+                    [32, 41, 43, 62, 71, 80]
+                    [38, 49, 51, 76, 87, 100, 107, 108]
+                    [44, 57, 59, 90, 103, 122, 131, 140]
+                    [50, 65, 67, 104, 119, 144, 155, 168, 175, 176]
+                    [56, 73, 75, 118, 135, 166, 179, 198, 207, 216]
+                    [62, 81, 83, 132, 151, 188, 203, 228, 239, 252, 259, 260]
+                    [68, 89, 91, 146, 167, 210, 227, 258, 271, 290, 299, 308]
+                    [74, 97, 99, 160, 183, 232, 251, 288, 303, 328, 339, 352, 359, 360]
+                    [80, 105, 107, 174, 199, 254, 275, 318, 335, 366, 379, 398, 407, 416]
+                    [86, 113, 115, 188, 215, 276, 299, 348, 367, 404, 419, 444, 455, 468, 475, 476]
+                    [92, 121, 123, 202, 231, 298, 323, 378, 399, 442, 459, 490, 503, 522, 531, 540]
+                    [98, 129, 131, 216, 247, 320, 347, 408, 431, 480, 499, 536, 551, 576, 587, 600, 607, 608]
+                    [104, 137, 139, 230, 263, 342, 371, 438, 463, 518, 539, 582, 599, 630, 643, 662, 671, 680]
+                    [110, 145, 147, 244, 279, 364, 395, 468, 495, 556, 579, 628, 647, 684, 699, 724, 735, 748, 755, 756]
+                    [116, 153, 155, 258, 295, 386, 419, 498, 527, 594, 619, 674, 695, 738, 755, 786, 799, 818, 827, 836]
+                    [122, 161, 163, 272, 311, 408, 443, 528, 559, 632, 659, 720, 743, 792, 811, 848, 863, 888, 899, 912, 919, 920]
+                    [128, 169, 171, 286, 327, 430, 467, 558, 591, 670, 699, 766, 791, 846, 867, 910, 927, 958, 971, 990, 999, 1008]
+                    [134, 177, 179, 300, 343, 452, 491, 588, 623, 708, 739, 812, 839, 900, 923, 972, 991, 1028, 1043, 1068, 1079, 1092, 1099, 1100]
+                    [140, 185, 187, 314, 359, 474, 515, 618, 655, 746, 779, 858, 887, 954, 979, 1034, 1055, 1098, 1115, 1146, 1159, 1178, 1187, 1196]
         """
         subtours, prev = [], -1
         last_idx = len(tour) - 1
-        while (ixs := sorted((tour.index(node) for node in subset)))[-1] == last_idx and ixs[-2] == ixs[-1] - 1:
-            subtours += [tour[-2:]]
-            tour[-2:], ixs[-2:] = [], []
-        for e, ix in enumerate(ixs):
+        for e, ix in enumerate(ixs := sorted((tour.index(node) for node in subset))):
             if e == len(ixs) - 1 and ix != last_idx:
                 if len(t1 := tour[prev + 1: ix]) > 1 or not t1:
                     subtours += (t1, tour[ix:])
@@ -255,22 +268,20 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
                     thread.append(upper)
         return bobbins
 
-    ends: Ends = 0, -1
-    colored_yarn = dye(yarn=spin(ZA[-1]))
     return weave()
 
 
 if __name__ == '__main__':
     from utils import get_G, save_G, stratify_A, id_seq, uon
 
-    uon_range = 80, 2000000
+    uon_range = 80, 79040
     orders = [order / 1000000 for order in uon(*uon_range)]
     all_times = []
 
     for order in uon(*uon_range):
         save = False
         G = get_G(order)
-        A, V, VI, E, EA = G['A'], G['V'], G['VI'], G['E'], G['EA']
+        A, V, VI, E, EA= G['A'], G['V'], G['VI'], G['E'], G['EA']
         if 'W' not in G or 'ZA' not in G:
             G['W'] = W = {n: sum(map(abs, V[n])) for n in A}
             G['ZA'] = ZA = stratify_A(A, V)
@@ -285,7 +296,7 @@ if __name__ == '__main__':
         order = len(A)
         ord_times = []
         woven = None
-        for _ in range(10):
+        for _ in range(50):
             start = time.time()
             woven = weave_solution(A, V, VI, EA, W, ZA)
             dur = time.time() - start

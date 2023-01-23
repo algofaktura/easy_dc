@@ -1,5 +1,5 @@
 # easy dc solver
-
+___
 An algorithm for solving the Hamiltonian cycle problem deterministically and in linear time on all instances of the discocube graphs:
 3-dimensional grid graphs derived from: a polycube of an octahedron | a Hauy construction of an octahedron using cubes as identical building blocks | the accretion of cubes around a central cube forming an octahedron at the limit...
 
@@ -11,12 +11,12 @@ always turning hamiltonian cycles in discocube graphs, and other stuff..,  it wa
 Art studies forms, the curvature of the neck as it disappears into the back, the color in the foreground, so luminous as to relegate all things behind it to irrelevance. So in this project, I studied the discocube as a body not as a discrete math object resulting in more doodles and sketches than equations on a page.
 
 ![Planar embedding of Cube and Discocubes](imgs/planaremb2.png?raw=true "Planar embedding of Cube and Discocubes")
-
+*Planar embedding of a cube and a discocube. from the set of all graphs G, where the order of G is of the ***Uncentered octahedral numbers*** [A130809](https://oeis.org/A130809) , only the first two instances shown above; n[0] and n[1] are planarly embeddable i.e., it can be represented on a two-dimensional surface without any of its edges crossing.*
 
 I hope to tell the story of the discocube, introduce an undefined graph class *Cubic Accretion Graphs*, some of its properties, and the share insights I've gained by solving this problem having taken an approach similar to that of sculpting the human body...After thousands of studies, drawings, a little math: this is a tiny glimpse into how moving towards a specific aethetic goal yields results. When a graph becomes an artist's muse, how does the artist go about rendering their vision as a painter paints a portrait?
 
 ![Discocubes](imgs/dcviews.png?raw=true "Discocubes")
-*Discocubes*
+*Discocubes 8 - 1760*
 
 What started as a hack-your-own version of a depth-first-search-with-shortcuts for the discocube graph (solving up to 960 vertices), metastasized into pages of overgrown mixin classes mysteriously coupled to each another like overgrown vines pushing me deeper and deeper into the underbelly of its mutant tentacles. Although it was able to solve instances of over a million vertices, it had the clarity of primordial soup. So, as a sadistic gardener I painstakingly pruned my own unescapable web (all those letters you haven't opened yet?) of thorny vines into presentable tiny bonsai trees. So what is a bonsai if not a tree in intimate scope?
 
@@ -34,7 +34,8 @@ Execution time of each order (in millions):
 *Hexprism Honeycomb Diamond*
 
 
-### Running times
+## Running times
+___
 As the order of the graph increases the number of function calls for each nodes goes down to less than 1.5 function calls when profiled using a 
 deterministic profiler. At around 2 million vertices the function call for each node goes down to almost one.
 
@@ -46,25 +47,27 @@ New running times cut down by the introduction of the colored yarns:
 
 ### solve vs solve_np
 I've managed to subdivide the process even further resulting in a function 400% faster: compare solve and solve_np for yourself:
+___
 ![Profile of solve](imgs/profile_solve.png?raw=true "Profile of solve")
 ![Profile of solve_np](imgs/profile_solve_np.png?raw=true "Profile of solve_np")
 ![Profile of solve_np](imgs/profile_solve_np2.png?raw=true "Profile of solve_np")
 
 ## Installation
-
+___
 You can install the package by running: 
 ```
 pip install easy_dc
 ```
 
 ## Usage
-
+___
 You can use the package by running the following command in the command line:
 ```
 solve(order)
 ```
 
 ## Command line usage
+___
 To use the package via the command line, navigate to the root directory of the project in your terminal and run the following command:
 ```
 python -m easy_dc solve [ORDER]
@@ -84,6 +87,7 @@ This will show a list of available orders, which can be used as input when runni
 Note that the first 25 instances, from order 32 to 26208, are already included in the package. If you want to solve higher instances, you will need to create the corresponding graphs first using the make_graphs command (see below).
 
 ## Creating graphs
+___
 To create new graphs, you can use the 'make_graphs' command:
 ```
 python -m easy_dc make_graphs [ORDER] 
@@ -106,15 +110,21 @@ Where order is an integer from the following list of available orders:
 The program will then solve the problem instance, display the time it took and plot the solution as a 3D line drawing.
 
 ## Additional Options
+___
 
 You can also use the '--output' flag to specify a custom directory to save the output graphs. For example:
 ```
 python -m easy_dc make_graphs 1373600 --output /path/to/custom/directory
 ```
+___
+![Alt text](imgs/dc960.JPG?raw=true "A Discocube with 960 vertices")
+
 ## Licensing:
+___
+
 This package is licensed under the MIT license.
 
 
-![Alt text](imgs/dc960.JPG?raw=true "A Discocube with 960 vertices")
+
 
 Happy reading!

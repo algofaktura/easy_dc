@@ -1,4 +1,3 @@
-import itertools
 from typing import (
     Any,
     Dict,
@@ -58,7 +57,7 @@ WarpedLoom = Dict[int, Any]
 Solution = List[int]
 FrozenEdges = Set[FrozenSet[int]]
 ColoredYarn = Union[List[List[int]], np.ndarray]
-Yarn_Spool = List[ColoredYarn]
+Yarn_Spool = Dict[str, ColoredYarn]
 
 
 __all__ = [
