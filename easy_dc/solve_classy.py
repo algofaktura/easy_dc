@@ -168,30 +168,3 @@ def weave_discocube(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: 
                 self.loop[:] = self.loop[ix_end - 1::-1] + self.loop[:ix_end - 1:-1]
 
     return Weaver().weave()
-
-
-if __name__ == '__main__':
-    import time
-    from easy_dc.utils import uon, get_G, stratify_A, id_seq
-
-    uon_range = 2288, 2288
-    times = []
-    for order in uon(*uon_range):
-        G = get_G(order)
-        A, V, VI, E, EA = G['A'], G['V'], G['VI'], G['E'], G['EA']
-        G['W'] = W = {n: sum(map(abs, V[n])) for n in A}
-        ZA = stratify_A(A, V)
-        ordtimes = []
-        for _ in range(1):
-            start = time.time()
-            woven = weave_discocube(A, V, VI, EA, W, ZA)
-            dur = time.time() - start
-            print()
-            print(f'⭕️ {order}')
-            print('💰', len(woven), id_seq(woven, A))
-            print(f'⌛️ {dur}')
-            print(f'🧮 {(dur / order) * 1000}')
-            print(f'📐 {order / 3}')
-            ordtimes.append(dur)
-        times.append(min(ordtimes))
-    print(f'ordtimes = {list(uon(*uon_range))}, {times}')

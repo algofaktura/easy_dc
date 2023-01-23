@@ -60,7 +60,7 @@ Once the tapestry is complete, it is removed from the loom. The tapestry is then
 """
 import time
 from collections import deque
-from itertools import combinations, pairwise, cycle
+from itertools import combinations, pairwise
 
 import numpy as np
 
@@ -200,14 +200,16 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
         """
         Get colored yarns for weaving.
         """
-        redblue = [(red := [V[node][:2] for node in yarn]), np.add(np.dot(np.array(red), [[-1, 0], [0, -1]])[-len(ZA[-3]):], [0, 2])]
-        return cycle(redblue if min(ZA) % 4 == 3 else redblue[::-1])
+        return {
+            'RED': (red := [V[node][:2] for node in yarn]),
+            'BLUE': np.add(np.dot(np.array(red), [[-1, 0], [0, -1]])[-len(ZA[-3]):], [0, 2])
+        }
 
     def get_yarn(zlevel=None, size=None) -> Path:
         """
         Get the yarn from the spool
         """
-        return [VI[(*xy, zlevel)] for xy in next(colored_yarn)[-size:]]
+        return [VI[(*xy, zlevel)] for xy in colored_yarn['RED' if zlevel % 4 == 3 else 'BLUE'][-size:]]
 
     def cut(tour: Path, subset: NodeSet) -> Paths:
         """
@@ -260,10 +262,12 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
 
 if __name__ == '__main__':
     from utils import get_G, save_G, stratify_A, id_seq, uon
-    orders = [order / 1000000 for order in uon(80, 79040)]
+
+    uon_range = 80, 2000000
+    orders = [order / 1000000 for order in uon(*uon_range)]
     all_times = []
 
-    for order in uon(80, 250000):
+    for order in uon(*uon_range):
         save = False
         G = get_G(order)
         A, V, VI, E, EA = G['A'], G['V'], G['VI'], G['E'], G['EA']
@@ -281,7 +285,7 @@ if __name__ == '__main__':
         order = len(A)
         ord_times = []
         woven = None
-        for _ in range(20):
+        for _ in range(10):
             start = time.time()
             woven = weave_solution(A, V, VI, EA, W, ZA)
             dur = time.time() - start

@@ -58,7 +58,7 @@ WarpedLoom = Dict[int, Any]
 Solution = List[int]
 FrozenEdges = Set[FrozenSet[int]]
 ColoredYarn = Union[List[List[int]], np.ndarray]
-Yarn_Spool = Iterator[ColoredYarn]
+Yarn_Spool = List[ColoredYarn]
 
 
 __all__ = [

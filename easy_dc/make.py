@@ -1,8 +1,10 @@
 from collections import defaultdict
 from itertools import product, chain, repeat
 
+from more_itertools import chunked
+
 from easy_dc.defs import *
-from easy_dc.utils import uon, save_G, timed
+from easy_dc.utils import uon, save_G
 from easy_dc.xyz import Xy
 
 
@@ -35,6 +37,29 @@ def make_dcgraph(ORD: int, save: bool = True) -> Graph:
         'CC': (cc_oe := make_coloring(A, both=True))[0],
         'OE': cc_oe[1],
         'ZA': stratify_A(A, V)
+    }
+    if save: save_G(G)
+    return G
+
+
+def make_gridgraph(x: int, y: int, z: Optional[int] = None, save: bool = True) -> Graph:
+    """
+    Make a discocube graph.
+    """
+    ORD = x * y * (z if z else 1)
+    A, E = ae_for_grid(x=x, y=y, z=z)
+    V = make_vertices_grid(x, y, z=z)
+    G = {
+        'ORD': ORD,
+        'V': V,
+        'VI': make_vi_map(V),
+        'E': E,
+        'A': A,
+        'EA': make_edges_adjacency(A, E),
+        'W': {n: sum(map(abs, V[n])) for n in A},
+        'CC': (cc_oe := make_coloring(A, both=True))[0],
+        'OE': cc_oe[1],
+        'ZA': stratify_A(A, V) if z else None
     }
     if save: save_G(G)
     return G
@@ -105,6 +130,13 @@ def make_adjacency(edges: Edges) -> AdjDict:
     return A
 
 
+def make_edges_from_adjacency(A: AdjDict) -> FrozenEdges:
+    """
+    Make edges from an adjacency list where each edge is a frozenset.
+    """
+    return {*map(frozenset, chain.from_iterable(map(lambda k: zip(repeat(k), A[k]), A)))}
+
+
 def make_edges_adjacency(A: AdjDict, E: Edges) -> EAdj:
     """
     Make an edges adjacency.
@@ -122,9 +154,11 @@ def make_coloring(A: AdjDict = None, both: bool = False, oddeven: bool = False) 
     specify output.
     """
     odd_even = {0: {0}, 1: {*A[0]}}
-    while set(A.keys()).difference(odd_even[0].union(odd_even[1])):
-        for odd in odd_even[0]: odd_even[1].update(A[odd])
-        for even in odd_even[1]: odd_even[0].update(A[even])
+    while {*A} - (odd_even[0] | odd_even[1]):
+        for odd in odd_even[0]:
+            odd_even[1] |= A[odd]
+        for even in odd_even[1]:
+            odd_even[0] |= A[even]
     colored_nodes = {number: key for key in odd_even.keys() for number in odd_even[key]}
     return odd_even if oddeven else (colored_nodes, odd_even) if both else colored_nodes
 
@@ -142,11 +176,11 @@ def stratify_A(A: AdjDict, V: Verts) -> GLvls:
         """
         return {z: {ix for ix, v in enumerate(V) if v[-1] == z} for z in sorted({vert[2] for vert in V}) if abs(z) != z}
 
-    def filter_graph(nodes) -> NodesMap:
+    def filter_graph(nodes: NodeSet) -> NodesMap:
         """
         Create graph with only the nodes in nodes.
         """
-        return {k: v.intersection(nodes) for k, v in A.items() if k in nodes}
+        return {k: v & nodes for k, v in A.items() if k in nodes}
 
     return {level: filter_graph(nodes) for level, nodes in stratified_nodes().items()}
 
@@ -172,7 +206,7 @@ def ae_for_grid(x: int = None, y: int = None, z: int = None, both: bool = False)
     edge lists. Otherwise, it returns the appropriate adjacency list and edge list for the specified dimensions of the grid.
     """
     xy_rng = range(_xy := x * y)
-    xy_grid = list(chunked(xy_rng, x))  # noqa
+    xy_grid = list(chunked(xy_rng, x))
     A, E = defaultdict(set), set()
     for iy in range(y):
         for ix in range(x):
@@ -216,25 +250,18 @@ def get_startpos(screen_size, cell_size, xy) -> Verts:
     return [(screen_size[i] - (xy[i] * cell_size)) // 2 for i in range(2)]
 
 
-def make_vertices_grid(x, y, cellsize, offset=(0, 0)) -> Verts:
+def make_vertices_grid(x, y, z: Optional[int] = None, cellsize: int = 2, offset=(0, 0, 0)) -> Verts:
     """
     Makes vertices based on cell size.
 
     """
-    return [(ix + offset[0], iy + offset[1]) for iy in range(0, y * cellsize, cellsize) for ix in range(0, x * cellsize, cellsize)]
+    if not z:
+        return [(ix + offset[0], iy + offset[1]) for iy in range(0, y * cellsize, cellsize) for ix in range(0, x * cellsize, cellsize)]
+    return [(ix, iy, iz) for iz in range(0, z * cellsize, cellsize) for iy in range(0, y * cellsize, cellsize) for ix in range(0, x * cellsize, cellsize)]
 
 
-def make_gridgraph(x, y, cell_size, screen_size=(1200, 1200)) -> Graph:
-    """
-    Make grid graph based on cellsize.
-    """
-    a, e = ae_for_grid(x, y)
-    return {
-        'startpos': (pos := get_startpos(screen_size=screen_size, cell_size=cell_size, xy=(x, y))),
-        'A': a,
-        'E': e,
-        'V': make_vertices(x, y, cell_size, offset=pos),
-        'V1': make_vertices(x, y, cellsize=2),
-        'CC': make_coloring(a)[0],
-        'EA': make_edges_adjacency(a, e)
-    }
+if __name__ == '__main__':
+    from utils import get_G
+    A = get_G(9120)['A']
+    cc = make_coloring(A)
+    print(cc)
