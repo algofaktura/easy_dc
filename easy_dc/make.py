@@ -258,10 +258,3 @@ def make_vertices_grid(x, y, z: Optional[int] = None, cellsize: int = 2, offset=
     if not z:
         return [(ix + offset[0], iy + offset[1]) for iy in range(0, y * cellsize, cellsize) for ix in range(0, x * cellsize, cellsize)]
     return [(ix, iy, iz) for iz in range(0, z * cellsize, cellsize) for iy in range(0, y * cellsize, cellsize) for ix in range(0, x * cellsize, cellsize)]
-
-
-if __name__ == '__main__':
-    from utils import get_G
-    A = get_G(9120)['A']
-    cc = make_coloring(A)
-    print(cc)

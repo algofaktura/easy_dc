@@ -5,7 +5,7 @@ from itertools import combinations, pairwise
 
 
 from easy_dc.defs import *
-from easy_dc.utils import profile, times, time
+from easy_dc.utils import profile, time
 
 
 @profile()
@@ -101,13 +101,12 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
         Place warp threads in loom.
         Thread the warp.
         """
-        bobbins = None
-        yarn, warps, loom = [], [], []
+        bobbins, loom = None, []
         rb_yarn = {3: (red := [V[node][:2] for node in spin(ZA[-1])]), 1: np.add(np.dot(np.array(red), [[-1, 0], [0, -1]])[-len(ZA[-3]):], [0, 2])}
         for z, zA in ZA.items():
             woven = set()
-            yarn[:] = [VI[(*xy, z)] for xy in rb_yarn[z % 4][-len(zA):]]
-            warps[:] = cut(yarn, bobbins) if bobbins else [yarn]
+            yarn = [VI[(*xy, z)] for xy in rb_yarn[z % 4][-len(zA):]]
+            warps = cut(yarn, bobbins) if bobbins else [yarn]
             for thread in loom:
                 for ix, warp in enumerate(warps):
                     if ix not in woven:
@@ -221,8 +220,8 @@ def main():
         G = get_G(order)
         A, V, VI, E, EA= G['A'], G['V'], G['VI'], G['E'], G['EA']
         if 'W' not in G or 'ZA' not in G:
-            G['W'] = W = {n: sum(map(abs, V[n])) for n in A}
-            G['ZA'] = ZA = stratify_A(A, V)
+            G['W'] = {n: sum(map(abs, V[n])) for n in A}
+            G['ZA'] = stratify_A(A, V)
             save = True
         W = G['W']
         ZA = G['ZA']
@@ -234,7 +233,7 @@ def main():
         order = len(A)
         ord_times = []
         woven = None
-        for _ in range(100):
+        for _ in range(10):
             start = time.time()
             woven = weave_solution(A, V, VI, EA, W, ZA)
             dur = time.time() - start

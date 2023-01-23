@@ -8,20 +8,6 @@ from easy_dc.defs import *
 from easy_dc.utils import uon, save_G
 
 
-def basis_vectors(unit: int = 2) -> BasisVectors:
-    """
-    Cube vectors centered at origin (0, 0, 0) with the edgelength of 2 to avoid floats.
-    """
-    return [array([0 if i != idx else 1 * s for i in range(3)]) for idx, x in enumerate('xyz') for s in (unit, -unit)]
-
-
-def axis_vectors(unit: int = 1) -> AxisVectors:
-    """
-    Rotation Vectors
-    """
-    return {x: {f'{x}{s}': array([0 if i != idx else 1 * int(f'{s}{unit}') for i in range(3)]) for s in ('+', '-')} for idx, x in enumerate('xyz')}
-
-
 def make_dcgraph(ORD: int, save: bool = True) -> Graph:
     """
     Make a discocube graph.
@@ -79,12 +65,26 @@ def make_vertices(ORD: int) -> Verts:
     return sorted(set(V), key=lambda x: (edist(x), x[0], x[1], x[2]))
 
 
+def basis_vectors(unit: int = 2) -> BasisVectors:
+    """
+    Cube vectors centered at origin (0, 0, 0) with the edgelength of 2 to avoid floats.
+    """
+    return [array([0 if i != idx else 1 * s for i in range(3)]) for idx, x in enumerate('xyz') for s in (unit, -unit)]
+
+
 def make_cube(p: ndarray = array((0, 0, 0))) -> ndarray:
     """
     From an origin point, create a cube consisting of 8 corners (vertices).
     """
     AX: AxisRotations = axis_vectors()
     return array([s + AX['z'][k] for k in AX['z'] for s in array([array(j) + AX['y'][k] for j in array([array(p) + AX['x'][k] for k in AX['x']]) for k in AX['y']])])
+
+
+def axis_vectors(unit: int = 1) -> AxisVectors:
+    """
+    Rotation Vectors
+    """
+    return {x: {f'{x}{s}': array([0 if i != idx else 1 * int(f'{s}{unit}') for i in range(3)]) for s in ('+', '-')} for idx, x in enumerate('xyz')}
 
 
 def edist(a) -> float:

@@ -38,10 +38,13 @@ As the order of the graph increases the number of function calls for each nodes 
 deterministic profiler. At around 2 million vertices the function call for each node goes down to almost one.
 
 New running times cut down by the introduction of the colored yarns:
-![Runtimes of each order](imgs/32-1000000.png?raw=true "Runtimes of each order")
-*after*
+
+***after***
+![Runtimes of each order](imgs/8-2million2.png?raw=true "Runtimes of each order")
+
+***before***
 ![Runtimes of each order](imgs/8-2million.png?raw=true "Runtimes of each order")
-*before*
+
 
 ### solve vs solve_np
 I've managed to subdivide the process even further resulting in a function 400% faster: compare solve and solve_np for yourself:
