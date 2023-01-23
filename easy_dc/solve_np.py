@@ -1,74 +1,14 @@
-"""
-How to weave tapestry.
+import numpy as np
 
-I: Spinning the yarn, coloring the yarn, assigning colors:
-    A.  Spinning the yarn:
-    The first step in making a tapestry is to create the yarn that will be used in the weaving process. This can be done by spinning raw fibers such as wool or cotton into long, thin strands using a spinning wheel or other tool.
-
-    spin() -> yarn:
-        walk a hamiltonian circuit starting from the node furthest from origin to towards the node closest to origin. One should find the hamiltonian path from the largest level in order to produce the longest piece of yarm. If the initial tour came from the least nodes: ie., min(vector[2]) it would result in only a tour with four nodes, which is useless in creating other tours.
-
-    B. Coloring the yarn:
-    Colors are chosen for the yarn based on a target image.
-    Every level can't use the same subtour as the order of the solution applies only to alternating levels. If the inital solution were found from the zlevel closest to origin, which is -1: The yarn produced from spin() applies only to zlevel: -5, -9, -13. We will call this yarn red.
-
-
-    dye(yarn) -> red_yarn, blue_yarn:
-        red_yarn is the original yarn produced, without rotations.
-        blue_yarn is the red_yarn rotated 180 degrees around the z-axis and displaced one unit length along the y-axis.
-
-    How to create the blue yarn?
-    The yarn for the other zlevels (blue_yarn) use can be calculated from the red yarn by rotating the vectors 180 degrees around the z-axis and then moving them one unit length along the y-axis. This will be the blue yarn.
-
-    C. Assigning a color to each level:
-        Each level is assigned to an alternating color, either red or blue. The levels corresponding to red are stored in red, and those corresponding to
-        blue are stored in blue:
-        assign_colors() -> red, blue:
-        assign_colors was removed in lieu of a cycle() iterator since the color alternates between blue and red it was not necessary to lookup the color each time.
-
-        Colors alternate between levels:
-            red: [-1, -5, -9, -13, -17, -21, -25, -29, ...]
-            blue: [-3, -7, -11, -15, -19, -23, -27, -31, ...]
-
-2.  Setting up the loom and threading the warp:
-        Once the yarn has been spun, the next step is to set up the loom on which the tapestry will be woven. This typically involves stretching a series
-    of parallel threads, called the warp, across the loom, and attaching them to the loom's frame.
-
-
-    Next, the yarn that was spun in step 1 is threaded through the warp threads, starting at the bottom of the loom and working up to the top.
-    This process is called threading the warp.
-    warp_loom() -> loom:
-        returns a loom with the warps fastenened to the loom requiring only that they be interleaved with the weft:
-
-
-3.  Weaving the weft:
-After the warp has been threaded, the weaver begins the process of weaving the weft, which is the yarn that will be used to create the design
-on the tapestry. This is done by using a shuttle to pass the weft yarn over and under the warp threads, following a predetermined pattern.
-
-    weave() -> Tapestry
-
-5.  Adding the weft:
-The weaver then adds the weft yarn to the loom by passing it over and under the warp threads. The weaver uses a comb to push the weft yarn
-tight against the previous row of weft yarn and to keep the warp threads straight.
-
-6.  Repeating the process:
-The weaver continues to add weft yarn, following the predetermined pattern, until the tapestry is the desired size. The weaver will continue
-to repeat the process of adding weft yarn to the loom until the tapestry is complete.
-
-7.  Removing the tapestry:
-Once the tapestry is complete, it is removed from the loom. The tapestry is then ready to be used or displayed.
-"""
-import time
 from collections import deque
 from itertools import combinations, pairwise
 
-import numpy as np
 
 from easy_dc.defs import *
-from easy_dc.utils import profile, times # noqa
+from easy_dc.utils import profile, times, time
 
 
-# @profile()
+@profile()
 def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: GLvls) -> Solution:
     """
     Solves the hamiltonian cycle problem in discocube graphs deterministically using divide and conquer (non-recursive) and in linear time (the time it takes grows to solve the problem grows linearly to the size of the input) . Uses the weaving process as inspiration and metaphor for the algorithmic design and process.
