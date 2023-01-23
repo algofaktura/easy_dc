@@ -241,7 +241,7 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
         for e, ix in enumerate(ixs := sorted((tour.index(node) for node in subset))):
             if e == len(ixs) - 1 and ix != last_idx:
                 if len(t1 := tour[prev + 1: ix]) > 1 or not t1:
-                    subtours += (t1, tour[ix:])
+                    subtours += [t1, tour[ix:]]
                 else:
                     subtours += [tour[prev + 1: ix + 1]]
             else:
