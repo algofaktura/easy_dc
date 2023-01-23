@@ -244,7 +244,6 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
                     subtours += (t1, tour[ix:])
                 else:
                     subtours += [tour[prev + 1: ix + 1]]
-                prev = None
             else:
                 subtours += [tour[prev + 1:ix + 1]]
                 prev = ix
