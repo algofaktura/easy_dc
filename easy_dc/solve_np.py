@@ -271,8 +271,8 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
 def main():
     from utils import get_G, save_G, stratify_A, id_seq, uon
 
-    uon_range = 80, 79040
-    orders = [order / 1000000 for order in uon(*uon_range)]
+    uon_range = 79040, 79040
+    orders = []
     all_times = []
     prev = 32
     prev_time = 0.00001
@@ -301,13 +301,14 @@ def main():
             ord_times.append(dur)
 
         all_times.append(min(ord_times))
-
+        orders.append(order / 1000000)
         print(f'⭕️ {order:>7} | order_growth: {order / prev} | ⏱️ {(currtime := all_times[-1]):.7f} | time_growth: {currtime / prev_time}| "🩺", {len(woven)}/{order}: {id_seq(woven, A)}')
+
+        print(f'orders = {orders}')
+        print(f'all_times = {all_times}')
+
         prev = order
         prev_time = currtime
-
-    print(f'orders = {orders}')
-    print(f'all_times = {all_times}')
 
 
 if __name__ == '__main__':

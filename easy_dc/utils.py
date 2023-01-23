@@ -51,7 +51,7 @@ def id_seq(seq: Path, A: AdjDict) -> Certificate:
     Certify sequence, return sequence type broken, loop, or snake.
     """
 
-    if len({*seq}) != len(A) or len(seq) != len(A):
+    if any((len({*seq}) != len(A), len(seq) != len(A))):
         return "💔"
     for s in range(1, len(seq)):
         if seq[s - 1] not in A[seq[s]]:
