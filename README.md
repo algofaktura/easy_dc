@@ -1,5 +1,4 @@
 # easy dc solver
-___
 An algorithm for solving the Hamiltonian cycle problem deterministically and in linear time on all instances of the discocube graphs:
 3-dimensional grid graphs derived from: a polycube of an octahedron | a Hauy construction of an octahedron using cubes as identical building blocks | the accretion of cubes around a central cube forming an octahedron at the limit...
 
