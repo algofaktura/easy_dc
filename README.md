@@ -7,7 +7,7 @@ Finding the solution to the problem reminded me of macramé, of tying knots, wea
 The focus of this work is to apply all that I know about this graph, not as a discrete mathematician, but as an artists with an eye towards visual aesthetics. Inspiration was the driving force behind the work (a bit of obsession I confess). How is the result
 of an artistic pursuit not art, even when it's just a little algorithm? An artist uses language and forms that language to communicate their vision to others, taking part in a process of translation from one medium to another, from vision to object, from words to dance.  
 This is a tiny result of that artistic investigative process and I hope it will be useful. I've grown so obsessed with the discocube object, really not unlike an obsessive artist's muse to the point of being a stalker. The goal wasn't to write a fast algorithm that finds 
-always turning hamiltonian cycles in discocube graphs, and other stuff..,  it was a constant moving of goalposts, of never being satisfied, of not knowing what, but of wanting more... until I could claim the discocube was my own (in my mind), as da Vinci would claim his painting of the Mona Lisa as his own.
+always turning hamiltonian cycles in discocube graphs, and other stuff...  it was a constant moving of goalposts, of never being satisfied, of not knowing what, but of wanting more... until I could claim the discocube was my own (in my mind), as da Vinci would claim his painting of the Mona Lisa as his own.
 Art studies forms, the curvature of the neck as it disappears into the back, the color in the foreground, so luminous as to relegate all things behind it to irrelevance. So in this project, I studied the discocube as a body not as a discrete math object resulting in more doodles and sketches than equations on a page.
 
 ![Planar embedding of Cube and Discocubes](imgs/planaremb2.png?raw=true "Planar embedding of Cube and Discocubes")
@@ -35,7 +35,6 @@ Execution time of each order (in millions):
 
 
 ## Running times
-___
 As the order of the graph increases the number of function calls for each nodes goes down to less than 1.5 function calls when profiled using a 
 deterministic profiler. At around 2 million vertices the function call for each node goes down to almost one.
 
@@ -47,27 +46,23 @@ New running times cut down by the introduction of the colored yarns:
 
 ### solve vs solve_np
 I've managed to subdivide the process even further resulting in a function 400% faster: compare solve and solve_np for yourself:
-___
 ![Profile of solve](imgs/profile_solve.png?raw=true "Profile of solve")
 ![Profile of solve_np](imgs/profile_solve_np.png?raw=true "Profile of solve_np")
 ![Profile of solve_np](imgs/profile_solve_np2.png?raw=true "Profile of solve_np")
 
 ## Installation
-___
 You can install the package by running: 
 ```
 pip install easy_dc
 ```
 
 ## Usage
-___
 You can use the package by running the following command in the command line:
 ```
 solve(order)
 ```
 
 ## Command line usage
-___
 To use the package via the command line, navigate to the root directory of the project in your terminal and run the following command:
 ```
 python -m easy_dc solve [ORDER]
@@ -87,7 +82,6 @@ This will show a list of available orders, which can be used as input when runni
 Note that the first 25 instances, from order 32 to 26208, are already included in the package. If you want to solve higher instances, you will need to create the corresponding graphs first using the make_graphs command (see below).
 
 ## Creating graphs
-___
 To create new graphs, you can use the 'make_graphs' command:
 ```
 python -m easy_dc make_graphs [ORDER] 
@@ -110,7 +104,6 @@ Where order is an integer from the following list of available orders:
 The program will then solve the problem instance, display the time it took and plot the solution as a 3D line drawing.
 
 ## Additional Options
-___
 
 You can also use the '--output' flag to specify a custom directory to save the output graphs. For example:
 ```
@@ -120,7 +113,6 @@ ___
 ![Alt text](imgs/dc960.JPG?raw=true "A Discocube with 960 vertices")
 
 ## Licensing:
-___
 
 This package is licensed under the MIT license.
 
