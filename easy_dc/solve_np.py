@@ -248,8 +248,6 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
             else:
                 subtours += [tour[prev + 1:ix + 1]]
                 prev = ix
-        if prev and (rest := tour[max(ixs) + 1:]):
-            subtours += [rest]
         return [tour if tour[0] in subset else tour[::-1] for tour in subtours if tour]
 
     def wind_bobbins(loom: Loom) -> NodeSet:
