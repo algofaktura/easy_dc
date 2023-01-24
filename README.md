@@ -56,6 +56,9 @@ I've managed to subdivide the process even further resulting in a function 400% 
 ### digital discocubes
 As each solution is as unique as a fingerprint, or a diamond it allows one to have their own digital version of a discocube, which is also an instruction for building your own.
 ![Discocube 3640 view](imgs/icy_cube.png?raw=true "icy cube")
+![Discocube 3640 view](imgs/icy_cube5.png?raw=true "icy cube")
+![Discocube 3640 view](imgs/icy_cube4.png?raw=true "icy cube")
+![Discocube 3640 view](imgs/icy_cube3.png?raw=true "icy cube another view")
 ![Discocube 3640 view](imgs/icy_cube2.png?raw=true "icy cube another view")
 *Icy Cube, using a different mirrored texture yields personalized results. With millions of combinations available, the possibilities are endless!*
 
