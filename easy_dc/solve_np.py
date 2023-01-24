@@ -36,7 +36,8 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
         """
 
         def __init__(self, loop):
-            self._eadjs_cache = {}
+            # self._eadjs_cache = {}
+            self.looped = None
             self.loop: Path = list(loop)
             self._eadjs = None
 
@@ -50,9 +51,13 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
             The current loop represented as a set of frozensets of edges.
             [0, 1, 2, 3] -> {frozenset([0, 1]), frozenset([1, 2]), frozenset([2, 3]), frozenset([3, 0])}
             """
-            if (loop := tuple(self.loop)) not in self._eadjs_cache:
-                self._eadjs_cache[loop] = {eadj for edge in self.edges for eadj in EA[edge]}
-            return self._eadjs_cache[loop]
+            if self.loop != self.looped:
+                self._eadjs = {eadj for edge in self.edges for eadj in EA[edge]}
+                self.looped = self.loop[:]
+            return self._eadjs
+            # if (loop := tuple(self.loop)) not in self._eadjs_cache:
+            #     self._eadjs_cache[loop] = {eadj for edge in self.edges for eadj in EA[edge]}
+            # return self._eadjs_cache[loop]
 
         def join(self, edge=None, oedge=None, other=None):
             """
@@ -208,9 +213,9 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
 
 
 def main():
-    from utils import get_G, id_seq, uon, count_nonturns, count_axes, count_axes1
+    from utils import get_G, id_seq, uon, count_nonturns, count_axes
 
-    uon_range = 9120, 9120
+    uon_range = 129720, 129720
     orders = []
     all_times = []
     for order in uon(*uon_range):
@@ -219,18 +224,12 @@ def main():
         ord_times = []
         assert order == len(A)
         woven = None
-        for _ in range(4):
+        for _ in range(50):
             start = time.time()
             woven = weave_solution(A, V, VI, EA, W, ZA)
             dur = time.time() - start
+            print(f'⏱️ {dur:.7f} ')
             ord_times.append(dur)
-            print(woven)
-            nonturns = count_nonturns(woven, A, V)
-            ax = count_axes(woven, V)
-            axnp = count_axes1(woven, V)
-            print('NONTURNS', nonturns)
-            print('axes', ax)
-            print('np', axnp)
         all_times.append(min(ord_times))
         orders.append(order / 1000000)
         print(f'⭕️ {order:>7} | ⏱️ {all_times[-1]:.7f} | "🩺", {len(woven)}/{order}: {id_seq(woven, A)}')
