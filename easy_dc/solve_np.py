@@ -5,10 +5,9 @@ from itertools import combinations, pairwise
 
 
 from easy_dc.defs import *
-from easy_dc.utils import profile, time
+from easy_dc.utils import profile, timed, time # noqa
 
 
-@profile()
 def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: GLvls) -> Solution:
     """
     Solves the hamiltonian cycle problem in discocube graphs deterministically using divide and conquer (non-recursive) and in linear time (the time it takes grows to solve the problem grows linearly to the size of the input) . Uses the weaving process as inspiration and metaphor for the algorithmic design and process.
@@ -37,22 +36,23 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
         """
 
         def __init__(self, loop):
+            self._eadjs_cache = {}
             self.loop: Path = list(loop)
+            self._eadjs = None
 
         @property
-        def edges(self) -> FrozenEdges:
-            """
-            The current loop represented as a set of frozensets of edges.
-            [0, 1, 2, 3] -> {frozenset([0, 1]), frozenset([1, 2]), frozenset([2, 3]), frozenset([3, 0])}
-            """
+        def edges(self):
             return {frozenset(edge) for edge in pairwise(self.loop + self.loop[:1])}
 
         @property
         def eadjs(self) -> FrozenEdges:
             """
-            Edges parallel to and one unit length distance away from each edge in self.edges.
+            The current loop represented as a set of frozensets of edges.
+            [0, 1, 2, 3] -> {frozenset([0, 1]), frozenset([1, 2]), frozenset([2, 3]), frozenset([3, 0])}
             """
-            return {eadj for edge in self.edges for eadj in EA[edge]}
+            if (loop := tuple(self.loop)) not in self._eadjs_cache:
+                self._eadjs_cache[loop] = {eadj for edge in self.edges for eadj in EA[edge]}
+            return self._eadjs_cache[loop]
 
         def join(self, edge=None, oedge=None, other=None):
             """
@@ -208,46 +208,35 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
 
 
 def main():
-    from utils import get_G, save_G, stratify_A, id_seq, uon
+    from utils import get_G, id_seq, uon, count_nonturns, count_axes, count_axes1
 
-    uon_range = 79040, 79040
+    uon_range = 9120, 9120
     orders = []
     all_times = []
-    prev = 32
-    prev_time = 0.00001
     for order in uon(*uon_range):
-        save = False
         G = get_G(order)
-        A, V, VI, E, EA= G['A'], G['V'], G['VI'], G['E'], G['EA']
-        if 'W' not in G or 'ZA' not in G:
-            G['W'] = {n: sum(map(abs, V[n])) for n in A}
-            G['ZA'] = stratify_A(A, V)
-            save = True
-        W = G['W']
-        ZA = G['ZA']
-        if len(A) != order:
-            print(f'ORD {len(A)} BUT IS UNDER WRONG FILE {order}')
-            save = True
-        if save:
-            save_G(G)
-        order = len(A)
+        A, V, VI, E, EA, W, ZA = G['A'], G['V'], G['VI'], G['E'], G['EA'], G['W'], G['ZA']
         ord_times = []
+        assert order == len(A)
         woven = None
-        for _ in range(10):
+        for _ in range(4):
             start = time.time()
             woven = weave_solution(A, V, VI, EA, W, ZA)
             dur = time.time() - start
             ord_times.append(dur)
-
+            print(woven)
+            nonturns = count_nonturns(woven, A, V)
+            ax = count_axes(woven, V)
+            axnp = count_axes1(woven, V)
+            print('NONTURNS', nonturns)
+            print('axes', ax)
+            print('np', axnp)
         all_times.append(min(ord_times))
         orders.append(order / 1000000)
-        print(f'⭕️ {order:>7} | order_growth: {order / prev} | ⏱️ {(currtime := all_times[-1]):.7f} | time_growth: {currtime / prev_time}| "🩺", {len(woven)}/{order}: {id_seq(woven, A)}')
+        print(f'⭕️ {order:>7} | ⏱️ {all_times[-1]:.7f} | "🩺", {len(woven)}/{order}: {id_seq(woven, A)}')
 
-        print(f'orders = {orders}')
-        print(f'all_times = {all_times}')
-
-        prev = order
-        prev_time = currtime
+    print(f'orders = {orders}')
+    print(f'all_times = {all_times}')
 
 
 if __name__ == '__main__':

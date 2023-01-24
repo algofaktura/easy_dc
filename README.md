@@ -11,7 +11,7 @@ This is a tiny result of that artistic investigative process and I hope it will 
 
 The goal wasn't to write a fast algorithm that finds always turning hamiltonian cycles in discocube graphs, and other stuff...  it was a constant moving of goalposts, of never being satisfied, of not knowing what, but of wanting more... until I could claim the discocube was my own (in my mind), as da Vinci would claim his painting of the Mona Lisa as his own.
 
-Art studies forms, the curvature of the neck as it disappears into the back, the color in the foreground, so luminous, relegating all things beyond to irrelevance. So in this project, I studied the discocube as a body, where each turn was conceptualized not as a discrete math object but as a dance move, resulting in more doodles and sketches than pages of equations.
+Art studies forms, the curvature of the neck as it disappears into the back, the color in the foreground, so luminous, relegating all things beyond to irrelevance. So in this project, I studied the discocube as a body, where each turn was conceptualized not as a discrete math object but as movement of the body, resulting in more doodles and sketches than pages of equations.
 
 ![Planar embedding of Cube and Discocubes](imgs/planaremb2.png?raw=true "Planar embedding of Cube and Discocubes")
 *Planar embedding of a cube and a discocube. from the set of all graphs G, where the order of G is of the ***Uncentered octahedral numbers*** [A130809](https://oeis.org/A130809), only the first two instances shown above; n[0] and n[1] are planarly embeddable i.e., it can be represented on a two-dimensional surface without any of its edges crossing.*

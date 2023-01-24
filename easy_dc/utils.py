@@ -1,11 +1,16 @@
 import cProfile
 from datetime import datetime
 from functools import wraps
+from itertools import accumulate
 import os
 import pickle
 import pstats
 import time
+from typing import List, Tuple
 
+import numpy as np
+from matplotlib import pyplot as plt
+from sklearn.metrics import r2_score
 
 from easy_dc.defs import *
 
@@ -46,19 +51,33 @@ def uon(start=8, end=3000000, n=800) -> UonGen:
             yield _uon
 
 
-def id_seq(seq: Path, A: AdjDict) -> Certificate:
+def id_loop(seq: Path, A: AdjDict) -> Certificate:
     """
     Certify sequence, return sequence type broken, loop, or snake.
     """
 
     if any((len({*seq}) != len(A), len(seq) != len(A))):
         return "💔"
+    for idx in range(len(seq)):
+        if seq[idx - 1] not in A[seq[idx]]:
+            return "💔"
+    return '🔁'
+
+
+def id_seq(seq, A, show=False) -> str or bool:
+    """
+    Certify sequence, return sequence type broken, loop, or snake.
+    """
     for s in range(1, len(seq)):
         if seq[s - 1] not in A[seq[s]]:
-            return "💔"
+            return show_broken(seq, A) if show else False
     if seq[0] in A[seq[-1]]:
-        return '🔁'
-    return '🐍'
+        return 'loop'
+    return 'snake'
+
+
+def show_broken(seq, A):
+    return list(filter(lambda n: not n[1], (((seq[s - 1], seq[s]), seq[s - 1] in A[seq[s]]) for s in range(len(seq)))))
 
 
 def pickleload(filename, mode='rb', show=False, raise_error=False) -> Any:
@@ -80,7 +99,7 @@ def pickleload(filename, mode='rb', show=False, raise_error=False) -> Any:
             raise FileNotFoundError
 
 
-def picklesave(to_pickle, filename, show=False, space=True) -> str:
+def picklesave(to_pickle, filename, show=True, space=True) -> str:
     """
     Serialize object to .pickle file
     """
@@ -130,13 +149,13 @@ def stratify_A(A: AdjDict, V: Verts) -> GLvls:
         """
         return {z: {ix for ix, v in enumerate(V) if v[-1] == z} for z in sorted({vert[2] for vert in V}) if abs(z) != z}
 
-    def filter_graph(nodes) -> NodesMap:
+    def filter_graph(data) -> NodesMap:
         """
-        Create graph with only the nodes in nodes.
+        Create graph with only the data in data.
         """
-        return {k: v.intersection(nodes) for k, v in A.items() if k in nodes}
+        return {k: v.intersection(data) for k, v in A.items() if k in data}
 
-    return {level: filter_graph(nodes) for level, nodes in stratified_nodes().items()}
+    return {level: filter_graph(data) for level, data in stratified_nodes().items()}
 
 
 def timed(fn):
@@ -259,3 +278,76 @@ def assemble_cycle(x, y, z, snake):
 
     #   RETURN JOINED
     return joined
+
+
+def plot_curve_with_regression(sizes: List[int], times: List[float]):
+    plt.scatter(sizes, times)
+    plt.xlabel("Input sizes in millions")
+    plt.ylabel("Execution times in seconds")
+    coefs = np.polyfit(sizes, times, deg=2)
+    der_coefs = np.polyder(coefs)
+    print("Slope:", float(der_coefs[0]))
+    x = np.linspace(min(sizes), max(sizes), num=100)
+    y = np.polyval(coefs, x)
+    predicted_times = np.polyval(coefs, sizes)
+    r2 = r2_score(times, predicted_times)
+    print("R^2:", r2)
+    plt.plot(x, y, '-r')
+    plt.show()
+    plot_curve(sizes, times)
+
+
+def plot_curve(sizes: List[int], times: List[float]):
+    """
+    Takes two inputs, a list of integers representing the x-axis values and a list of floats representing the y-axis values,
+    and plots a curve using these two inputs:
+    """
+    plt.plot(sizes, times)
+    plt.xlabel("Input sizes")
+    plt.ylabel("Execution times")
+    plt.show()
+
+
+def get_edge_axis(edge, V) -> int:
+    return next(filter(lambda i: V[edge[0]][i] != V[edge[1]][i], range(3)))
+
+
+def get_points_axis(p1, p2) -> int:
+    return next(filter(lambda i: p1[i] != p2[i], range(3)))
+
+
+def count_nonturns(data: Path, A: AdjDict, V: Verts) -> int:
+    """
+    ::SNAKE VERSION::
+    Counts the number of non-turns in a list of data and V.
+
+    A non-turn is defined as a pair of edges (m, n) and (n, o) that have the same direction.
+
+    Args:
+        data: A list of indices of V in the V list.
+        V: A list of 3D vector points.
+        A: Adjlist
+    Returns:
+        The number of non-turns in the list of data and V.
+    """
+    count = 0
+    for i in range(len(data)) if id_seq(data, A) == 'loop' else range(1, len(data) - 2):
+        m, n = V[data[i - 1]], V[data[i]]
+        o = V[data[0]] if i == len(data) - 1 else V[data[i + 1]]
+        if (n[0] - m[0]) * (o[0] - n[0]) + (n[1] - m[1]) * (o[1] - n[1]) + (n[2] - m[2]) * (o[2] - n[2]) > 0:
+            count += 1
+    if not count:
+        print('superperfect:', data)
+    return count
+
+
+def count_axes(data: List[int], V: List[Tuple[int, int, int]]) -> List[int]:
+    """
+    Count number of edges are in each axis.
+    Return the max.
+    """
+    counts = [0, 0, 0]
+    for i in range(len(data)):
+        m, n = V[data[i - 1]], V[data[i]]
+        counts[0 if m[0] != n[0] else int(m[1] != n[1]) or 2] += 1
+    return min(counts)

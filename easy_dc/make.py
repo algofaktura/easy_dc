@@ -8,20 +8,6 @@ from easy_dc.utils import uon, save_G
 from easy_dc.xyz import Xy
 
 
-def basis_vectors(unit: int = 2) -> BasisVectors:
-    """
-    Cube vectors centered at origin (0, 0, 0) with the edgelength of 2 to avoid floats.
-    """
-    return [Xy([0 if i != idx else 1 * s for i in range(3)]) for idx, x in enumerate('xyz') for s in (unit, -unit)]
-
-
-def axis_vectors(unit: int = 1) -> AxisVectors:
-    """
-    Rotation Vectors
-    """
-    return {x: {f'{x}{s}': Xy([0 if i != idx else 1 * int(f'{s}{unit}') for i in range(3)]) for s in ('+', '-')} for idx, x in enumerate('xyz')}
-
-
 def make_dcgraph(ORD: int, save: bool = True) -> Graph:
     """
     Make a discocube graph.
@@ -65,13 +51,27 @@ def make_gridgraph(x: int, y: int, z: Optional[int] = None, save: bool = True) -
     return G
 
 
+def basis_vectors(unit: int = 2) -> BasisVectors:
+    """
+    Cube vectors centered at origin (0, 0, 0) with the edgelength of 2 to avoid floats.
+    """
+    return [Xy([0 if i != idx else 1 * s for i in range(3)]) for idx, x in enumerate('xyz') for s in (unit, -unit)]
+
+
+def axis_vectors(unit: int = 1) -> AxisVectors:
+    """
+    Rotation Vectors
+    """
+    return {x: {f'{x}{s}': Xy([0 if i != idx else 1 * int(f'{s}{unit}') for i in range(3)]) for s in ('+', '-')} for idx, x in enumerate('xyz')}
+
+
 def make_vertices(ORD: int) -> Verts:
     """
     Vertices from the order.
     """
     OGN: Vector = 0, 0, 0
     BV: BasisVectors = basis_vectors()
-    ORD_N = {order: n + 1 for n, order in enumerate(uon(8, 3_000_000))}
+    ORD_N = {order: n + 1 for n, order in enumerate(uon(8, 3_300_000))}
     stages = {k: set() if k else {OGN} for k in range(ORD_N[ORD])}
     for lvl in range(1, ORD_N[ORD]):
         stages[lvl] = {(Xy(vec) + xyz).data for vec in stages[lvl - 1] for xyz in BV}
@@ -258,3 +258,8 @@ def make_vertices_grid(x, y, z: Optional[int] = None, cellsize: int = 2, offset=
     if not z:
         return [(ix + offset[0], iy + offset[1]) for iy in range(0, y * cellsize, cellsize) for ix in range(0, x * cellsize, cellsize)]
     return [(ix, iy, iz) for iz in range(0, z * cellsize, cellsize) for iy in range(0, y * cellsize, cellsize) for ix in range(0, x * cellsize, cellsize)]
+
+
+if __name__ == '__main__':
+    for order in uon(2000000, 3100000):
+        make_dcgraph(order)
