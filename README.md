@@ -1,13 +1,17 @@
 # easy dc solver
-An algorithm for solving the Hamiltonian cycle problem deterministically and in linear time on all instances of the discocube graphs:
+An algorithm for solving the Hamiltonian cycle problem deterministically and in linear time on all instances of discocube graphs which are:
 3-dimensional grid graphs derived from: a polycube of an octahedron | a Hauy construction of an octahedron using cubes as identical building blocks | the accretion of cubes around a central cube forming an octahedron at the limit...
 
-Finding the solution to the problem reminded me of macramé, of tying knots, weaving and how repeating certain movements resulted in certain patterns. So there must be a 'weave' I could use to expose underlying unit structure and repeat this throughout. 
+Finding the solution to the problem reminded me of macramé, of tying knots, weaving and how repeating certain movements resulted in certain patterns. I followed the thought further and asked myself if there was a 'weave' I could use to expose underlying unit structure and repeat this throughout to get an initial solution which could later be mutated to produce a more polished solution. 
+
 The focus of this work is to apply all that I know about this graph, not as a discrete mathematician, but as an artists with an eye towards visual aesthetics. Inspiration was the driving force behind the work (a bit of obsession I confess). How is the result
-of an artistic pursuit not art, even when it's just a little algorithm? An artist uses language and forms that language to communicate their vision to others, taking part in a process of translation from one medium to another, from vision to object, from words to dance.  
-This is a tiny result of that artistic investigative process and I hope it will be useful. I've grown so obsessed with the discocube object, really not unlike an obsessive artist's muse to the point of being a stalker. The goal wasn't to write a fast algorithm that finds 
-always turning hamiltonian cycles in discocube graphs, and other stuff...  it was a constant moving of goalposts, of never being satisfied, of not knowing what, but of wanting more... until I could claim the discocube was my own (in my mind), as da Vinci would claim his painting of the Mona Lisa as his own.
-Art studies forms, the curvature of the neck as it disappears into the back, the color in the foreground, so luminous as to relegate all things behind it to irrelevance. So in this project, I studied the discocube as a body not as a discrete math object resulting in more doodles and sketches than equations on a page.
+of an artistic pursuit not art, even when it's just a little algorithm? An artist uses language and forms that language to communicate their vision to others, taking part in a process of translation from one medium to another, from vision to object, from words to movement. (Sorting algorithms reminds of piano rolls).  
+
+This is a tiny result of that artistic investigative process and I hope it will be useful. I've grown so obsessed with the discocube object, really not unlike an obsessive artist's muse to the point of being a stalker. 
+
+The goal wasn't to write a fast algorithm that finds always turning hamiltonian cycles in discocube graphs, and other stuff...  it was a constant moving of goalposts, of never being satisfied, of not knowing what, but of wanting more... until I could claim the discocube was my own (in my mind), as da Vinci would claim his painting of the Mona Lisa as his own.
+
+Art studies forms, the curvature of the neck as it disappears into the back, the color in the foreground, so luminous, relegating all things beyond to irrelevance. So in this project, I studied the discocube as a body, where each turn was conceptualized not as a discrete math object but as a dance move, resulting in more doodles and sketches than pages of equations.
 
 ![Planar embedding of Cube and Discocubes](imgs/planaremb2.png?raw=true "Planar embedding of Cube and Discocubes")
 *Planar embedding of a cube and a discocube. from the set of all graphs G, where the order of G is of the ***Uncentered octahedral numbers*** [A130809](https://oeis.org/A130809), only the first two instances shown above; n[0] and n[1] are planarly embeddable i.e., it can be represented on a two-dimensional surface without any of its edges crossing.*
