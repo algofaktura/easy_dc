@@ -60,8 +60,8 @@ New running times cut down by the introduction of the colored yarns:
 ### digital discocubes
 As each solution is as unique as a fingerprint, or a diamond it allows one to have their own digital version of a discocube, which is also an instruction for building your own.
 
-
-![Discocube 3640 view](imgs/icy_cube.png?raw=true "icy cube") ![Discocube 3640 view](imgs/icy_cube5.png?raw=true "icy cube")
+![Discocube 3640 view](imgs/icy_cube.png?raw=true "icy cube") 
+![Discocube 3640 view](imgs/icy_cube5.png?raw=true "icy cube")
 ![Discocube 3640 view](imgs/icy_cube4.png?raw=true "icy cube")
 ![Discocube 3640 view](imgs/icy_cube3.png?raw=true "icy cube another view")
 ![Discocube 3640 view](imgs/icy_cube2.png?raw=true "icy cube another view")
@@ -127,7 +127,7 @@ You can also use the '--output' flag to specify a custom directory to save the o
 python -m easy_dc make_graphs 1373600 --output /path/to/custom/directory
 ```
 ___
-![Alt text](imgs/dc960.JPG?raw=true "A Discocube with 960 vertices")
+![A Discocube with 960 vertices](imgs/dc960.JPG?raw=true "A Discocube with 960 vertices")
 
 ## Licensing:
 
