@@ -4,7 +4,7 @@ from collections import deque
 from itertools import combinations, pairwise
 
 from easy_dc.defs import *
-from easy_dc.utils import profile, timed, time # noqa
+from easy_dc.utils import profile, timed, time, count_nonturns, count_axes  # noqa
 
 
 def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: GLvls) -> Solution:
@@ -104,8 +104,11 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
         Place warp threads in loom.
         Thread the warp.
         """
+        rb_yarn = {
+            3: (red := [V[node][:2] for node in spin(ZA[-1])]),
+            1: np.add(np.dot(np.array(red), [[-1, 0], [0, -1]])[-len(ZA[-3]):], [0, 2])
+        }
         bobbins, loom = None, []
-        rb_yarn = {3: (red := [V[node][:2] for node in spin(ZA[-1])]), 1: np.add(np.dot(np.array(red), [[-1, 0], [0, -1]])[-len(ZA[-3]):], [0, 2])}
         for z, zA in ZA.items():
             woven = set()
             yarn = [VI[(*xy, z)] for xy in rb_yarn[z % 4][-len(zA):]]
@@ -213,7 +216,7 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
 def main():
     from utils import get_G, id_seq, uon
 
-    uon_range = 32, 500000
+    uon_range = 9120, 9120
     orders = []
     all_times = []
     for order in uon(*uon_range):
@@ -225,6 +228,9 @@ def main():
         for _ in range(50):
             start = time.time()
             woven = weave_solution(A, V, VI, EA, W, ZA)
+            nonturns = count_nonturns(woven, A, V)
+            ax = count_axes(woven, V)
+            print('NONTURNS:', nonturns, '|', 'AXES:', ax, len(woven))
             dur = time.time() - start
             # print(f'⏱️ {dur:.7f} ')
             ord_times.append(dur)

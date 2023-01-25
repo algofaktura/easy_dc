@@ -5,15 +5,18 @@ An algorithm for solving the Hamiltonian cycle problem deterministically and in 
 ![Planar embedding of Cube and Discocubes](imgs/planar_emb.png?raw=true "Planar embedding of Cube and Discocubes")
 *Planar embedding of a cube and a discocube. from the set of all graphs G, where the order of G is of the ***Uncentered octahedral numbers*** [A130809](https://oeis.org/A130809), only the first two instances shown above; n[0] and n[1] are planarly embeddable i.e., it can be represented on a two-dimensional surface without any of its edges crossing.*
 
+![First 11 discocubes and their order (number of nodes)](imgs/rect5857.png?raw=true "Discocubes orders")
+*The first eleven discocubes and their respective orders (number of nodes)*
 
 Finding the solution to the problem reminded me of macramé, of tying knots, weaving and how repeating certain movements resulted in certain patterns. I followed the thought further and asked myself if there was a 'weave' I could use to expose underlying unit structure and repeat this throughout to get an initial solution which could later be mutated to produce a more polished solution. 
 
-The focus of this work is to apply all that I know about this graph, not as a discrete mathematician, but as an artists with an eye towards visual aesthetics. Inspiration was the driving force behind the work (a bit of obsession I confess). How is the result
-of an artistic pursuit not art, even when it's just a little algorithm? An artist uses language and forms that language to communicate their vision to others, taking part in a process of translation from one medium to another, from vision to object, from words to movement. (Sorting algorithms reminds of piano rolls).  
+The focus of this work is to apply all that I know about this graph, not as a discrete mathematician, but as an artists with an eye towards visual aesthetics. Inspiration was the driving force behind the work (a bit of obsession I confess). 
+
+From expressing the desire to sculpt a 3-dimensional contour drawing of an object to reformulating this desire mathematically as searching for a Hamiltonian cycle in specific yet unidentified graph sketches are indistinguishable from mini algorithms.  An artist uses language and forms that language to communicate their vision to others, taking part in a process of translation from one medium to another, from vision to object, from words to movement, just as a programmer might transform ideas into an orchestra of processing with the perfect score.
 
 This is a tiny result of that artistic investigative process and I hope it will be useful. I've grown so obsessed with the discocube object, really not unlike an obsessive artist's muse to the point of being a stalker. 
 
-The goal wasn't to write a fast algorithm that finds always turning hamiltonian cycles in discocube graphs, and other stuff...  it was a constant moving of goalposts, of never being satisfied, of not knowing what, but of wanting more... until I could claim the discocube was my own (in my mind), as da Vinci would claim his painting of the Mona Lisa as his own.
+The goal wasn't to write a fast algorithm that finds always turning hamiltonian cycles in discocube graphs, and other stuff...  it was a constant moving of goalposts, of never being satisfied, of not knowing what, but of wanting more... until I could claim the discocube was my own (in my mind), as a painter would claim a portrait their own after having spent months realizing a vision.
 
 Art studies forms, the curvature of the neck as it disappears into the back, the color in the foreground, so luminous, relegating all things beyond to irrelevance. So in this project, I studied the discocube as a body, where each turn was conceptualized not as a discrete math object but as movement of the body, resulting in more doodles and sketches than pages of equations.
 
@@ -56,9 +59,9 @@ New running times cut down by the introduction of the colored yarns:
 
 ### digital discocubes
 As each solution is as unique as a fingerprint, or a diamond it allows one to have their own digital version of a discocube, which is also an instruction for building your own.
-![Discocube 3640 view](imgs/icy_cube.png?raw=true "icy cube")
 
-![Discocube 3640 view](imgs/icy_cube5.png?raw=true "icy cube")
+
+![Discocube 3640 view](imgs/icy_cube.png?raw=true "icy cube") ![Discocube 3640 view](imgs/icy_cube5.png?raw=true "icy cube")
 ![Discocube 3640 view](imgs/icy_cube4.png?raw=true "icy cube")
 ![Discocube 3640 view](imgs/icy_cube3.png?raw=true "icy cube another view")
 ![Discocube 3640 view](imgs/icy_cube2.png?raw=true "icy cube another view")

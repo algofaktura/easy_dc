@@ -71,7 +71,7 @@ def make_vertices(ORD: int) -> Verts:
     """
     OGN: Vector = 0, 0, 0
     BV: BasisVectors = basis_vectors()
-    ORD_N = {order: n + 1 for n, order in enumerate(uon(8, 3_300_000))}
+    ORD_N = {order: n + 1 for n, order in enumerate(uon(8, 10_000_000))}
     stages = {k: set() if k else {OGN} for k in range(ORD_N[ORD])}
     for lvl in range(1, ORD_N[ORD]):
         stages[lvl] = {(Xy(vec) + xyz).data for vec in stages[lvl - 1] for xyz in BV}
@@ -261,5 +261,5 @@ def make_vertices_grid(x, y, z: Optional[int] = None, cellsize: int = 2, offset=
 
 
 if __name__ == '__main__':
-    for order in uon(2000000, 3100000):
+    for order in uon(5061680, 5061680):
         make_dcgraph(order)
