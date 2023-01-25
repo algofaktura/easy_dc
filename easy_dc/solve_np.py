@@ -3,7 +3,6 @@ import numpy as np
 from collections import deque
 from itertools import combinations, pairwise
 
-
 from easy_dc.defs import *
 from easy_dc.utils import profile, timed, time # noqa
 
@@ -36,28 +35,27 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
         """
 
         def __init__(self, loop):
-            # self._eadjs_cache = {}
-            self.looped = None
             self.loop: Path = list(loop)
+            self.looped = None
             self._eadjs = None
 
         @property
         def edges(self):
+            """
+            The current loop represented as a set of frozensets of edges.
+            [0, 1, 2, 3] -> {frozenset([0, 1]), frozenset([1, 2]), frozenset([2, 3]), frozenset([3, 0])}
+            """
             return {frozenset(edge) for edge in pairwise(self.loop + self.loop[:1])}
 
         @property
         def eadjs(self) -> FrozenEdges:
             """
-            The current loop represented as a set of frozensets of edges.
-            [0, 1, 2, 3] -> {frozenset([0, 1]), frozenset([1, 2]), frozenset([2, 3]), frozenset([3, 0])}
+            Edges parallel to and one unit length distance away from each edge in self.edges.
             """
             if self.loop != self.looped:
                 self._eadjs = {eadj for edge in self.edges for eadj in EA[edge]}
                 self.looped = self.loop[:]
             return self._eadjs
-            # if (loop := tuple(self.loop)) not in self._eadjs_cache:
-            #     self._eadjs_cache[loop] = {eadj for edge in self.edges for eadj in EA[edge]}
-            # return self._eadjs_cache[loop]
 
         def join(self, edge=None, oedge=None, other=None):
             """
@@ -213,9 +211,9 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
 
 
 def main():
-    from utils import get_G, id_seq, uon, count_nonturns, count_axes
+    from utils import get_G, id_seq, uon
 
-    uon_range = 129720, 129720
+    uon_range = 32, 500000
     orders = []
     all_times = []
     for order in uon(*uon_range):
@@ -228,7 +226,7 @@ def main():
             start = time.time()
             woven = weave_solution(A, V, VI, EA, W, ZA)
             dur = time.time() - start
-            print(f'⏱️ {dur:.7f} ')
+            # print(f'⏱️ {dur:.7f} ')
             ord_times.append(dur)
         all_times.append(min(ord_times))
         orders.append(order / 1000000)

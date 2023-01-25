@@ -12,6 +12,7 @@ from typing import List, Dict, Set, Tuple
 from easy_dc.solve_np import weave_solution
 from utils import get_G, id_seq, uon, count_nonturns, count_axes
 
+
 zeroone = [-1, 0]
 
 
@@ -93,7 +94,6 @@ def main():
         ax = count_axes(data, V)
         print('NONTURNS:', nonturns, '|', len(data))
         print('AXES:', ax)
-
     uon_range = 20800, 20800
     orders = []
     all_times = []
@@ -102,14 +102,14 @@ def main():
         A, V, VI, E, EA, W, ZA = G['A'], G['V'], G['VI'], G['E'], G['EA'], G['W'], G['ZA']
         woven = weave_solution(A, V, VI, EA, W, ZA)
         show_turns(woven)
-
-        for _ in range(100):
+        ax = 0
+        while ax < order // 4:
             woven = keep_away(A, V, woven)
             show_turns(woven)
             woven = loop_snake(woven, A, V)
             show_turns(woven)
             print(woven)
-            print(f'⭕️ {order:>7} | "🩺", {len(woven)}/{order}: {id_seq(woven, A)}')
+            print(f'⭕️ {order:>7} | AX {order // 3} "🩺", {len(woven)}/{order}: {id_seq(woven, A)}')
 
     print(f'orders = {orders}')
     print(f'all_times = {all_times}')
