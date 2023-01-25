@@ -50,10 +50,7 @@ New running times cut down by the introduction of the colored yarns:
 ![Runtimes of each order](imgs/8-2million.png?raw=true "Runtimes of each order")
 
 
-### solve vs solve_np
-I've managed to subdivide the process even further resulting in a function 400% faster: compare solve and solve_np for yourself:
-![Profile of solve](imgs/profile_solve.png?raw=true "Profile of solve")
-![Profile of solve_np](imgs/profile_solve_np.png?raw=true "Profile of solve_np")
+### solve profile 1373600 vertices:
 ![Profile of solve_np](imgs/profile_solve_np2.png?raw=true "Profile of solve_np")
 
 
