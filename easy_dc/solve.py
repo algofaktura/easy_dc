@@ -1,7 +1,6 @@
 import numpy as np
 
 from collections import deque
-from itertools import combinations
 
 from easy_dc.make import shrink_adjacency
 from easy_dc.defs import *
@@ -95,13 +94,14 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
             762_272  ->  42
         """
         loom = warp_loom()
-        while len(loom) > 1:
-            for ix_warp, ix_weft in combinations(loom.keys(), 2):
-                if bridge := (warp := loom[ix_warp]).edges & (weft := loom[ix_weft]).eadjs:
+        warp = loom.pop(0)
+        while loom:
+            for ix_weft in loom.keys():
+                if bridge := warp.edges & (weft := loom[ix_weft]).eadjs:
                     if weft_edges := EA[warp_edge := bridge.pop()] & weft.edges:
                         warp.join(edge=tuple(warp_edge), oedge=tuple(weft_edges.pop()), other=loom.pop(ix_weft))
                         break
-        return loom[0].loop
+        return warp.loop
 
     def warp_loom() -> WarpedLoom:
         """
@@ -127,7 +127,7 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
                                 else:
                                     thread.extendleft(warp[1:])
             loom.extend((deque(warp) for warp in (w for ix, w in enumerate(warps) if ix not in woven)))
-            bobbins = {*wind_bobbins(loom)} if z != -1 else None
+            bobbins = wind_bobbins(loom) if z != -1 else None
         for w in loom:
             w += [VI[(vector := V[node])[0], vector[1], -vector[2]] for node in reversed(w)]
         return {idx: Loop(warp) for idx, warp in enumerate(sorted(loom))}
@@ -223,7 +223,7 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
 
 
 def main():
-    uon_range = 79040, 79040
+    uon_range = 32, 79040
     woven, orders, all_times = None, [], []
     woven = None
     for order in uon(*uon_range):
@@ -232,7 +232,7 @@ def main():
         A, V, VI, EA, W = G['A'], G['V'], G['VI'], G['EA'], G['W']
         ZA = G['ZA'] = shrink_adjacency(A, V)
         save_G(G)
-        for _ in range(50):
+        for _ in range(1):
             start = time.time()
             woven = weave_solution(A, V, VI, EA, W, ZA)
             dur = time.time() - start
