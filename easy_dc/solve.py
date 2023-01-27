@@ -265,19 +265,16 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
         """
         bobbins: NodeSet = set()
         for thread in loom:
-            for end in ends:
-                bobbins.add(upper := VI[(vector := V[thread[end]])[0], vector[1], vector[2] + 2])
-                if not end:
-                    thread.appendleft(upper)
-                else:
-                    thread.append(upper)
+            bobbins.update((left := VI[(v1 := V[thread[0]])[0], v1[1], v1[2] + 2], right := VI[(v2 := V[thread[-1]])[0], v2[1], v2[2] + 2]))
+            thread.appendleft(left)
+            thread.append(right)
         return bobbins
 
     return weave()
 
 
 def main():
-    uon_range = 32, 79040
+    uon_range = 79040, 79040
     woven, orders, all_times = None, [], []
     woven = None
     for order in uon(*uon_range):
@@ -286,7 +283,7 @@ def main():
         A, V, VI, EA, W = G['A'], G['V'], G['VI'], G['EA'], G['W']
         ZA = G['ZA'] = shrink_adjacency(A, V)
         save_G(G)
-        for _ in range(1):
+        for _ in range(20):
             start = time.time()
             woven = weave_solution(A, V, VI, EA, W, ZA)
             dur = time.time() - start

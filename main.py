@@ -1,8 +1,8 @@
 import argparse
 import time
 
-from easy_dc.utils import get_G
-from easy_dc.solve import weave_discocube
+from easy_dc.utils.io import get_G
+from easy_dc.solve import weave_solution
 
 
 parser = argparse.ArgumentParser(description='Welcome to solve_dc package! Installing this package created the first 25 instances, from order 32 to 26208. You can solve higher instances but the graphs will have to be produced first.')
@@ -20,10 +20,10 @@ if args.help:
 
 def solve(order):
     G = get_G(order)
-    A, V, VI, E, EA = G['A'], G['V'], G['VI'], G['E'], G['EA']
+    A, V, VI, W, ZA, EA = G['A'], G['V'], G['VI'], G['W'], G['ZA'], G['EA']
     print("solving order ", order)
     start = time.time()
-    weave_discocube(A, V, VI, EA)
+    weave_solution(A, V, VI, EA, W, ZA)
     dur = time.time() - start
     print("Time taken: ", dur)
 
