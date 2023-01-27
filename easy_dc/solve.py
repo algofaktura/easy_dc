@@ -50,7 +50,8 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
             The current loop represented as a set of frozensets of edges.
             [0, 1, 2, 3] -> {frozenset([0, 1]), frozenset([1, 2]), frozenset([2, 3]), frozenset([3, 0])}
             """
-            return {frozenset(edge) for edge in pairwise(self.loop + self.loop[:1])}
+            return {frozenset(edge) for edge in zip(self.loop, self.loop[1:] + self.loop[:1])}
+            # return {frozenset(edge) for edge in pairwise(self.loop + self.loop[:1])}
 
         @property
         def eadjs(self) -> FrozenEdges:
@@ -222,7 +223,7 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
 
 
 def main():
-    uon_range = 2997280, 2997280
+    uon_range = 79040, 79040
     woven, orders, all_times = None, [], []
     woven = None
     for order in uon(*uon_range):
@@ -231,7 +232,7 @@ def main():
         A, V, VI, EA, W = G['A'], G['V'], G['VI'], G['EA'], G['W']
         ZA = G['ZA'] = stratify_A(A, V)
         save_G(G)
-        for _ in range(1):
+        for _ in range(50):
             start = time.time()
             woven = weave_solution(A, V, VI, EA, W, ZA)
             dur = time.time() - start
