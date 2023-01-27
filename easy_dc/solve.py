@@ -176,6 +176,7 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
         to_spin = len(ZA[-1]) - 1
         for _ in range(to_spin):
             spool.append(sorted(ZA[-1][spool[-1]] - {*spool}, key=lambda n: W[n])[-1])
+
         return {
             3: (natural := [V[node][:2] for node in spool]),
             1: np.add(np.dot(np.array(natural), [[-1, 0], [0, -1]])[-ZA[-3]:], [0, 2])
