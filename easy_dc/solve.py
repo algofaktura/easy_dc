@@ -15,7 +15,7 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
     """
     Solves the hamiltonian cycle problem in discocube graphs deterministically using divide and conquer (non-recursive) and in linear time (the time it takes grows to solve the problem grows linearly to the size of the input) . Uses the weaving process as inspiration and metaphor for the algorithmic design and process.
     1. Spin yarn: create an initial hamiltonian path from the node furthest from the origin to the origin
-    2. color yarn: each level alternates in color from beige to blue. The blue yarn is a 180 rotation around the z-axis and a unit length displacement
+    2. color yarn: each level alternates in color from natural to blue. The blue yarn is a 180 rotation around the z-axis and a unit length displacement
     in the y direction.
 
     As the size of the input grows, the time it takes to solve the problem increases by a factor proportional to the input.
@@ -170,7 +170,7 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
         the hamiltonian path from the largest level in order to produce the longest piece of yarm. If the initial tour came from the least nodes ie.,
         min(vector[2]) it would result in only a tour with four nodes, which is useless in creating other tours.
 
-        Color the beige thread blue by rotating the sequence vectors 180 degrees around the z-axis and displace 1 unit length along the y-axis.
+        Color the natural thread blue by rotating the sequence vectors 180 degrees around the z-axis and displace 1 unit length along the y-axis.
         """
         # Spin the thread
         spool = [max(ZA[-1])]
@@ -178,10 +178,10 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
         for _ in range(rest):
             spool.append(sorted(ZA[-1][spool[-1]] - {*spool}, key=lambda n: W[n])[-1])
 
-        # Return the beige and blue colored spool
+        # Return the natural and blue colored spool
         return {
-            3: (beige := [V[node][:2] for node in spool]),
-            1: np.add(np.dot(np.array(beige), [[-1, 0], [0, -1]])[-ZA[-3]:], [0, 2])
+            3: (natural := [V[node][:2] for node in spool]),
+            1: np.add(np.dot(np.array(natural), [[-1, 0], [0, -1]])[-ZA[-3]:], [0, 2])
         }
 
     def cut(tour: Path, subset: NodeSet) -> Paths:
