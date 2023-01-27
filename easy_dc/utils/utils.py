@@ -40,7 +40,7 @@ def get_G(ORD, make=False) -> Graph:
     """
     Get DC graph.
     """
-    from easy_dc.graph import make_dcgraph
+    from easy_dc.make import make_dcgraph
     if make:
         return make_dcgraph(ORD, save=True)
     try:

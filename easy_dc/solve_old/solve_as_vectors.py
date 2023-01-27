@@ -3,7 +3,6 @@ import numpy as np
 from collections import deque
 from itertools import combinations, pairwise
 
-import easy_dc.graph
 from easy_dc.defs import *
 from easy_dc.utils import profile, timed, time, count_nonturns, count_axes, save_G  # noqa
 

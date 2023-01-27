@@ -4,9 +4,8 @@ from itertools import product, chain, repeat
 from more_itertools import chunked
 
 from easy_dc.defs import *
-from easy_dc.xyz import Xy
-from easy_dc.utils import save_G
-from easy_dc.info import edist, uon
+from easy_dc.utils.utils import save_G
+from easy_dc.utils.info import edist, uon
 
 
 def make_dcgraph(ORD: int, save: bool = True) -> Graph:

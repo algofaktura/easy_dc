@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 import os
 
-from easy_dc.graph import make_dcgraph
+from easy_dc.make import make_dcgraph
 from easy_dc.utils import uon
 
 
