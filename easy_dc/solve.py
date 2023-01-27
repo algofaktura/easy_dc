@@ -15,7 +15,7 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
     """
     Solves the hamiltonian cycle problem in discocube graphs deterministically using divide and conquer (non-recursive) and in linear time (the time it takes grows to solve the problem grows linearly to the size of the input) . Uses the weaving process as inspiration and metaphor for the algorithmic design and process.
     1. Spin yarn: create an initial hamiltonian path from the node furthest from the origin to the origin
-    2. color yarn: each level alternates in color from red to blue. The blue yarn is a 180 rotation around the z-axis and a unit length displacement
+    2. color yarn: each level alternates in color from beige to blue. The blue yarn is a 180 rotation around the z-axis and a unit length displacement
     in the y direction.
 
     As the size of the input grows, the time it takes to solve the problem increases by a factor proportional to the input.
@@ -111,7 +111,7 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
 
     def weave() -> Solution:
         """
-        Weave the weft.
+        Warp loom, Weave the weft.
         len of loom is very small:
         for a graph with n vertices:
             n            loops in loom
@@ -131,10 +131,12 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
 
     def warp_loom() -> WarpedLoom:
         """
-        Warping.
-        Setting up the loom.
-        Place warp threads in loom.
-        Thread the warp.
+        Spin the yarn, color it. Start at the bottom and work your way up z axis:
+        Get all the necessary colored yarn needed for this level to the number of nodes in the current level.
+        Wind bobbins.  Take the bobbins and cut the larger colored yarn and wrap the threads around the bobbins.
+        Thread the Warp: Join the bobbined yarn to the threads already in the loom.
+        Repeat until all the levels are finished.
+        Return loom.
         """
         bobbins, loom = None, []
         spool = spin()
@@ -153,7 +155,7 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
                                 else:
                                     thread.extendleft(warp[1:])
             loom.extend((deque(warp) for warp in (w for ix, w in enumerate(warps) if ix not in woven)))
-            bobbins = wind_bobbins(loom) if z != -1 else None
+            bobbins = wind(loom) if z != -1 else None
         for w in loom:
             w += [VI[(vector := V[node])[0], vector[1], -vector[2]] for node in reversed(w)]
         return {idx: Loop(warp) for idx, warp in enumerate(sorted(loom))}
@@ -167,27 +169,52 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
         spin() -> yarn: walk a hamiltonian circuit starting from the node furthest from origin to towards the node closest to origin. One should find
         the hamiltonian path from the largest level in order to produce the longest piece of yarm. If the initial tour came from the least nodes ie.,
         min(vector[2]) it would result in only a tour with four nodes, which is useless in creating other tours.
+
+        Color the beige thread blue by rotating the sequence vectors 180 degrees around the z-axis and displace 1 unit length along the y-axis.
         """
         # Spin the thread
         spool = [max(ZA[-1])]
-        warp_length = len(ZA[-1]) - 1
-        for _ in range(warp_length):
+        rest = len(ZA[-1]) - 1
+        for _ in range(rest):
             spool.append(sorted(ZA[-1][spool[-1]] - {*spool}, key=lambda n: W[n])[-1])
 
-        # Return the red and blue colored spool
+        # Return the beige and blue colored spool
         return {
-            3: (red := [V[node][:2] for node in spool]),
-            1: np.add(np.dot(np.array(red), [[-1, 0], [0, -1]])[-ZA[-3]:], [0, 2])
+            3: (beige := [V[node][:2] for node in spool]),
+            1: np.add(np.dot(np.array(beige), [[-1, 0], [0, -1]])[-ZA[-3]:], [0, 2])
         }
 
     def cut(tour: Path, subset: NodeSet) -> Paths:
         """
-        Given a set S of integers representing a tour, and a subset T of S, the goal is to partition the tour
-        into the least number of subtours such that the length of each subtour is longer than 2 unless the subtour consists of
-        a node from the subset. At least one node from the subset (if there are more than subset node in the subtour)
-        in the subtour is in the first index (as a result of reversing the sequence) to facilitate extending to the loom threads.
 
-        number of bobbins increases by 2 as the level grows:
+        This function takes in two inputs: a list called `tour` and a set called `subset`. It returns a list of lists.
+        It sorts the index of the nodes in `tour` that are in `subset` and creates multiple sublists of `tour`
+        based on the indices of the `subset` nodes. Finally, it returns a new list that contains each tour in
+        `subtours` in reverse order if the first element of the tour is not in `subset`, otherwise the tour is returned as is.
+
+        Args:
+        tour: List of integers representing the nodes in a tour.
+        subset: set of integers representing the nodes in a subset.
+
+        Returns:
+        List of list of integers representing the sublists of `tour`
+
+        Restrictions:
+        tour: list of integers, len(tour) > 0
+        subset: set of integers, subset ⊆ tour, len(subset) > 0
+
+        Given a list S of integers representing a tour and a subset T of S, where S = {s1, s2, ..., sn} and T = {t1, t2, ..., tm}, the function cut(S, T) returns a new list of lists R, where each list in R is a sublist of S and satisfies the following conditions:
+
+            For each r in R, r is a sublist of S and is either a subset of T or its complement set (S-T)
+            For each r in R, if the first element of r is not in T, then r is in reverse order.
+
+        Mathematically, this can be represented as:
+        R = {r1, r2, ..., rk} where ri ⊆ S and (r1 U r2 U ... U rk) = S and (r1 ∩ r2 ∩ ... ∩ rk) = {} and
+        ri = {sj | (sj ∈ S) and (sj ∈ T or sj ∈ (S-T))} if sj ∈ ri and sj ∈ T , else ri = {sj | (sj ∈ S) and (sj ∈ T or sj ∈ (S-T))} in reverse order.
+
+        Complexity note:
+
+        the number of bobbins increases by 2 as the level grows:
 
         ixs = sorted((tour.index(node) for node in subset))
         print(ixs):
@@ -229,7 +256,7 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
                 prev = ix
         return [tour if tour[0] in subset else tour[::-1] for tour in subtours if tour]
 
-    def wind_bobbins(loom: Loom) -> NodeSet:
+    def wind(loom: Loom) -> NodeSet:
         """
         returns a set of bobbins. it sets the bobbins for the next level by adding the upper and lower neighbors of the first and last element
         of each thread in the loom. The method iterates over the threads in the loom and adds the upper and lower
