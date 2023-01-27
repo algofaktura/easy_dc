@@ -203,7 +203,8 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
         tour: list of integers, len(tour) > 0
         subset: set of integers, subset ⊆ tour, len(subset) > 0
 
-        Given a list S of integers representing a tour and a subset T of S, where S = {s1, s2, ..., sn} and T = {t1, t2, ..., tm}, the function cut(S, T) returns a new list of lists R, where each list in R is a sublist of S and satisfies the following conditions:
+        Given a list S of integers representing a tour and a subset T of S, where S = {s1, s2, ..., sn} and T = {t1, t2, ..., tm},
+        the function cut(S, T) returns a new list of lists R, where each list in R is a sublist of S and satisfies the following conditions:
 
             For each r in R, r is a sublist of S and is either a subset of T or its complement set (S-T)
             For each r in R, if the first element of r is not in T, then r is in reverse order.
