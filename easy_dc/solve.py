@@ -1,13 +1,14 @@
 import numpy as np
 
 from collections import deque
-from itertools import combinations, pairwise
+from itertools import combinations
 
-from easy_dc.make import stratify_A
+from easy_dc.make import shrink_adjacency
 from easy_dc.defs import *
-from easy_dc.utils.info import id_seq, uon
+from easy_dc.utils.info import id_seq
+from easy_dc.utils.gens import uon
 from easy_dc.utils.decs import profile, time
-from easy_dc.utils.utils import get_G, save_G
+from easy_dc.utils.io import get_G, save_G
 
 
 @profile()
@@ -50,8 +51,7 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
             The current loop represented as a set of frozensets of edges.
             [0, 1, 2, 3] -> {frozenset([0, 1]), frozenset([1, 2]), frozenset([2, 3]), frozenset([3, 0])}
             """
-            return {frozenset(edge) for edge in zip(self.loop, self.loop[1:] + self.loop[:1])}
-            # return {frozenset(edge) for edge in pairwise(self.loop + self.loop[:1])}
+            return {*map(frozenset, zip(self.loop, self.loop[1:] + self.loop[:1]))}
 
         @property
         def eadjs(self) -> FrozenEdges:
@@ -230,7 +230,7 @@ def main():
         ord_times = []
         G = get_G(order)
         A, V, VI, EA, W = G['A'], G['V'], G['VI'], G['EA'], G['W']
-        ZA = G['ZA'] = stratify_A(A, V)
+        ZA = G['ZA'] = shrink_adjacency(A, V)
         save_G(G)
         for _ in range(50):
             start = time.time()

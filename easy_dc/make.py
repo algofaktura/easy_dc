@@ -4,8 +4,9 @@ from itertools import product, chain, repeat
 from more_itertools import chunked
 
 from easy_dc.defs import *
-from easy_dc.utils.utils import save_G
-from easy_dc.utils.info import edist, uon
+from easy_dc.utils.io import save_G
+from easy_dc.utils.info import edist
+from easy_dc.utils.gens import uon
 
 
 def make_dcgraph(ORD: int, save: bool = True) -> Graph:
@@ -23,7 +24,7 @@ def make_dcgraph(ORD: int, save: bool = True) -> Graph:
         'W': {n: sum(map(abs, V[n])) for n in A},
         'CC': (cc_oe := make_coloring(A, both=True))[0],
         'OE': cc_oe[1],
-        'ZA': stratify_A(A, V)
+        'ZA': shrink_adjacency(A, V)
     }
     if save:
         save_G(G)
@@ -47,7 +48,7 @@ def make_gridgraph(x: int, y: int, z: Optional[int] = None, save: bool = True) -
         'W': {n: sum(map(abs, V[n])) for n in A},
         'CC': (cc_oe := make_coloring(A, both=True))[0],
         'OE': cc_oe[1],
-        'ZA': stratify_A(A, V) if z else None
+        'ZA': shrink_adjacency(A, V) if z else None
     }
     if save:
         save_G(G)
@@ -159,7 +160,7 @@ def make_coloring(A: AdjDict = None, both: bool = False, oddeven: bool = False) 
     return odd_even if oddeven else (colored_nodes, odd_even) if both else colored_nodes
 
 
-def stratify_A(A: AdjDict, V: Verts) -> GLvls:
+def shrink_adjacency(A: AdjDict, V: Verts) -> GLvls:
     """
     Reduce the graph to an adjacency dict for xy plane whose z value is -1, which is the level just below the origin (0, 0, 0).
     For every other level, save the length of nodes (level_order) for that z level.

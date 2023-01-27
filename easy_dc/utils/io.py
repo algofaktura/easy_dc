@@ -58,14 +58,3 @@ def save_G(G):
     Get DC graph.
     """
     picklesave(G, os.path.join(FP_GRAPHS, str(len(G['A']))))
-
-
-def unpack(nested_list) -> Unpacker:
-    """
-    Unpack (completely) a nested list into a generator
-    """
-    for nested in nested_list:
-        if isinstance(nested, Iterable) and not isinstance(nested, (str, bytes)):
-            yield from unpack(nested)
-        else:
-            yield nested

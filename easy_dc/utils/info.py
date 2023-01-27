@@ -1,16 +1,6 @@
 from easy_dc.defs import *
 
 
-def uon(start=8, end=3000000, n=800) -> UonGen:
-    """
-    Generator for the uncentered octahedral numbers.
-    """
-    for i in range(n + 2):
-        _uon = sum([(n * (n + 2)) for n in range(0, n * 2 + 2, 2)][:i])
-        if end >= _uon >= start:
-            yield _uon
-
-
 def absumv(n, V):
     """
     Get the accretion level of an point in a 3d grid graph.
