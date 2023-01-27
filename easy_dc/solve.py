@@ -35,8 +35,20 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
 
     class Loop:
         """
-        Simple loop class with an edges property: the sequence as a set of edges, or
-        an edges adj: all the adjacent edges of the loop, ie are parallel to the individual edges of the loop.
+        Loop Class for representing a loop of edges.
+
+        Attributes:
+            loop (list): A list of edges that represent the loop.
+            looped (list): A copy of the loop attribute to check if the loop has been modified.
+            _eadjs (set): A set of edges that are parallel to and one unit length distance away from each edge in self.edges.
+
+        Methods:
+            join: Rotates the loop according to an edge and extends it to the end.
+            rotate_to_edge: Rotates the loop so that the edge matches the ends of the loop.
+
+        Properties:
+            edges: returns the current loop represented as a set of frozensets of edges.
+            eadjs: returns edges parallel to and one unit length distance away from each edge in self.edges.
         """
 
         def __init__(self, loop):
@@ -48,7 +60,10 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
         def edges(self):
             """
             The current loop represented as a set of frozensets of edges.
+
             [0, 1, 2, 3] -> {frozenset([0, 1]), frozenset([1, 2]), frozenset([2, 3]), frozenset([3, 0])}
+
+            Calculated all the time as the self.loop value constantly changes.
             """
             return {*map(frozenset, zip(self.loop, self.loop[1:] + self.loop[:1]))}
 
@@ -56,6 +71,8 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
         def eadjs(self) -> FrozenEdges:
             """
             Edges parallel to and one unit length distance away from each edge in self.edges.
+
+            Calculate only if the loop value has changed.
             """
             if self.loop != self.looped:
                 self._eadjs = {eadj for edge in self.edges for eadj in EA[edge]}
@@ -64,7 +81,12 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
 
         def join(self, edge=None, oedge=None, other=None):
             """
-            Rotate loop according to edge and merely extend to the end.
+            Rotates the loop according to an edge and extends it to the end.
+
+            Args:
+                edge (tuple): the edge to rotate the loop to.
+                oedge (tuple): the edge to rotate the other loop to.
+                other (Loop): the other loop to join to this one.
             """
             self.rotate_to_edge(*edge)
             other.rotate_to_edge(*(oedge if oedge[0] in A[edge[-1]] else oedge[::-1]))
@@ -72,8 +94,13 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
 
         def rotate_to_edge(self, start: int, end: int):
             """
-            Rotates loop so that the edge are the matches the ends of the loop:
+            Rotates the loop so that the edge matches the ends of the loop.
+
             Edge (1, 7) -> Loop (1, 3, 4, 5, 6, 2, 7)
+
+            Args:
+                start (int): the starting vertex of the edge.
+                end (int): the ending vertex of the edge.
             """
             if start == self.loop[-1] and end == self.loop[0]:
                 self.loop[:] = self.loop[::-1]
@@ -93,8 +120,7 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
             540_200  ->  37
             762_272  ->  42
         """
-        loom = warp_loom()
-        warp = loom.pop(0)
+        warp = (loom := warp_loom()).pop(0)
         while loom:
             for ix_weft in loom.keys():
                 if bridge := warp.edges & (weft := loom[ix_weft]).eadjs:
