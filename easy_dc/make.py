@@ -66,7 +66,8 @@ def axis_vectors(unit: int = 1) -> AxisVectors:
     """
     Rotation Vectors
     """
-    return {x: {f'{x}{s}': Xy([0 if i != idx else 1 * int(f'{s}{unit}') for i in range(3)]) for s in ('+', '-')} for idx, x in enumerate('xyz')}
+    return {x: {f'{x}{s}': Xy([0 if i != idx else 1 * int(f'{s}{unit}') for i in range(3)]) for s in ('+', '-')} for
+            idx, x in enumerate('xyz')}
 
 
 def make_vertices(ORD: int) -> Verts:
@@ -79,7 +80,9 @@ def make_vertices(ORD: int) -> Verts:
     stages = {k: set() if k else {OGN} for k in range(ORD_N[ORD])}
     for lvl in range(1, ORD_N[ORD]):
         stages[lvl] = {(Xy(vec) + xyz).data for vec in stages[lvl - 1] for xyz in BV}
-    V = (p for ve in (tuple(tuple(c) for c in make_cube(p)) for p in set((tuple(v) for vc in list(stages.values()) for v in vc))) for p in ve)
+    V = (p for ve in
+         (tuple(tuple(c) for c in make_cube(p)) for p in set((tuple(v) for vc in list(stages.values()) for v in vc)))
+         for p in ve)
     return sorted(set(V), key=lambda x: (edist(x), x[0], x[1], x[2]))
 
 
@@ -88,7 +91,10 @@ def make_cube(p: Xy = Xy((0, 0, 0))) -> Xy:
     From an origin point, create a cube consisting of 8 corners (vertices).
     """
     AX: AxisRotations = axis_vectors()
-    return Xy([s + AX['z'][k] for k in AX['z'] for s in Xy([Xy(j) + AX['y'][k] for j in Xy([Xy(p) + AX['x'][k] for k in AX['x']]) for k in AX['y']])])
+    return Xy(
+        [s + AX['z'][k] for k in AX['z']
+         for s in Xy([Xy(j) + AX['y'][k] for j in Xy([Xy(p) + AX['x'][k] for k in AX['x']])
+                      for k in AX['y']])])
 
 
 def make_vi_map(V: Verts) -> IdxMap:
@@ -104,7 +110,9 @@ def make_edges(V: Verts, VI: IdxMap, unit: int = 2) -> Edges:
     """
     BV: BasisVectors = basis_vectors(unit=unit)
     VS: QuickSet = make_quickset(V)
-    return tuple(((i, VI[e]) for i, n in enumerate((((Xy(p) + xz).data for xz in BV if VS.issuperset([(Xy(p) + xz).data])) for p in V)) for e in n))
+    return tuple(((i, VI[e]) for i, n in
+                  enumerate((((Xy(p) + xz).data for xz in BV if VS.issuperset([(Xy(p) + xz).data])) for p in V)) for e
+                  in n))
 
 
 def make_quickset(to_set: Iterable) -> QuickSet:
@@ -162,7 +170,8 @@ def make_coloring(A: AdjDict = None, both: bool = False, oddeven: bool = False) 
 
 def shrink_adjacency(A: AdjDict, V: Verts) -> GLvls:
     """
-    Reduce the graph to an adjacency dict for xy plane whose z value is -1, which is the level just below the origin (0, 0, 0).
+    Reduce the graph to an adjacency dict for xy plane whose z value is -1, which is the level just below the origin
+    (0, 0, 0).
     For every other level, save the length of nodes (level_order) for that z level.
     Partition the Adjacency according to the z-axis.
     The resulting subgraphs is a 2d graph for the z-level -1 and level order for the rest.
@@ -191,17 +200,26 @@ def make_grid_ae(x: int = None, y: int = None, z: int = None, both: bool = False
         x: the width of the grid
     y: the height of the grid
     z: the depth of the grid (for 3D grids)
-    both: a boolean flag indicating whether to return both 2D and 3D versions of the adjacency lists and edge lists as a dictionary.
+    both: a boolean flag indicating whether to return both 2D and 3D versions of the adjacency lists and edge lists
+    as a dictionary.
 
-    The function first creates a 2D grid of vertices using the xy_rng range object and the chunked function. It then initializes empty adjacency
-    lists and edge lists A and E, respectively. Next, the function loops through the rows and columns of the grid, and for each vertex n, it adds its
-    adjacent vertices to the adjacency list A and the corresponding edges to the edge list E. If the vertex is in the middle of the grid, it adds
-    edges to all four of its adjacent vertices. If the vertex is on the edge or in a corner of the grid, it only adds edges to the adjacent vertices
-    that exist. If the z parameter is not provided (indicating a 2D grid), the function returns the adjacency list A and the edge list E.
-    If the z parameter is provided (indicating a 3D grid), the function generates an adjacency list A3 and an edge list E3 for the 3D grid by looping
+    The function first creates a 2D grid of vertices using the xy_rng range object and the chunked function. It then
+    initializes empty adjacency
+    lists and edge lists A and E, respectively. Next, the function loops through the rows and columns of the grid,
+    and for each vertex n, it adds its
+    adjacent vertices to the adjacency list A and the corresponding edges to the edge list E. If the vertex is in the
+    middle of the grid, it adds
+    edges to all four of its adjacent vertices. If the vertex is on the edge or in a corner of the grid, it only adds
+    edges to the adjacent vertices
+    that exist. If the z parameter is not provided (indicating a 2D grid), the function returns the adjacency list A
+    and the edge list E.
+    If the z parameter is provided (indicating a 3D grid), the function generates an adjacency list A3 and an edge
+    list E3 for the 3D grid by looping
     through the 2D layers of the grid and adding edges between each layer and the one above and below it.
-    Finally, if the both parameter is set to True, the function returns a dictionary containing both the 2D and 3D versions of the adjacency lists and
-    edge lists. Otherwise, it returns the appropriate adjacency list and edge list for the specified dimensions of the grid.
+    Finally, if the both parameter is set to True, the function returns a dictionary containing both the 2D and 3D
+    versions of the adjacency lists and
+    edge lists. Otherwise, it returns the appropriate adjacency list and edge list for the specified dimensions of
+    the grid.
     """
     xy_rng = range(_xy := x * y)
     xy_grid = list(chunked(xy_rng, x))
@@ -245,8 +263,10 @@ def make_vertices_grid(x, y, z: Optional[int] = None, cellsize: int = 2, offset=
 
     """
     if not z:
-        return [(ix + offset[0], iy + offset[1]) for iy in range(0, y * cellsize, cellsize) for ix in range(0, x * cellsize, cellsize)]
-    return [(ix, iy, iz) for iz in range(0, z * cellsize, cellsize) for iy in range(0, y * cellsize, cellsize) for ix in range(0, x * cellsize, cellsize)]
+        return [(ix + offset[0], iy + offset[1]) for iy in range(0, y * cellsize, cellsize) for ix in
+                range(0, x * cellsize, cellsize)]
+    return [(ix, iy, iz) for iz in range(0, z * cellsize, cellsize) for iy in range(0, y * cellsize, cellsize) for ix in
+            range(0, x * cellsize, cellsize)]
 
 
 def assemble_cycle(x, y, z, snake):
