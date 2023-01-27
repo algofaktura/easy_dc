@@ -4,14 +4,15 @@ from itertools import product, chain, repeat
 from more_itertools import chunked
 
 from easy_dc.defs import *
-from easy_dc.utils import uon, save_G
 from easy_dc.xyz import Xy
+from easy_dc.utils import save_G, uon
 
 
 def make_dcgraph(ORD: int, save: bool = True) -> Graph:
     """
     Make a discocube graph.
     """
+
     G = {
         'ORD': ORD,
         'V': (V := make_vertices(ORD)),
@@ -165,14 +166,15 @@ def make_coloring(A: AdjDict = None, both: bool = False, oddeven: bool = False) 
 
 def stratify_A(A: AdjDict, V: Verts) -> GLvls:
     """
+    Reduce the graph to an adjacency dict for xy plane whose z value is -1, which is the level just below the origin (0, 0, 0).
+    For every other level, save the length of nodes (level_order) for that z level.
     Partition the Adjacency according to the z-axis.
-    The resulting subgraphs are 2d grid graphs.
+    The resulting subgraphs is a 2d graph for the z-level -1 and level order for the rest.
     """
 
     def stratified_nodes() -> AdjDict:
         """
-        The adjacency should be partitioned so that the graph consists of planes of x, y,
-        starting from the bottom.
+        Returns a adjacency dictionary of only the z-floor level just below origin.
         """
         return {z: {ix for ix, v in enumerate(V) if v[-1] == z} for z in sorted({vert[2] for vert in V}) if abs(z) != z}
 
@@ -182,7 +184,7 @@ def stratify_A(A: AdjDict, V: Verts) -> GLvls:
         """
         return {k: v & nodes for k, v in A.items() if k in nodes}
 
-    return {level: filter_graph(nodes) for level, nodes in stratified_nodes().items()}
+    return {level: filter_graph(nodes) if level == -1 else len(nodes) for level, nodes in stratified_nodes().items()}
 
 
 def ae_for_grid(x: int = None, y: int = None, z: int = None, both: bool = False) -> Graph:
@@ -258,8 +260,3 @@ def make_vertices_grid(x, y, z: Optional[int] = None, cellsize: int = 2, offset=
     if not z:
         return [(ix + offset[0], iy + offset[1]) for iy in range(0, y * cellsize, cellsize) for ix in range(0, x * cellsize, cellsize)]
     return [(ix, iy, iz) for iz in range(0, z * cellsize, cellsize) for iy in range(0, y * cellsize, cellsize) for ix in range(0, x * cellsize, cellsize)]
-
-
-if __name__ == '__main__':
-    for order in uon(5061680, 5061680):
-        make_dcgraph(order)

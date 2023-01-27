@@ -8,8 +8,38 @@ from easy_dc.defs import *
 from easy_dc.utils import profile, timed, time, count_nonturns, count_axes, save_G  # noqa
 
 
+def stratify_A2(A: AdjDict, V: Verts) -> GLvls:
+    """
+    Partition the Adjacency according to the z-axis.
+    The resulting subgraphs are 2d grid graphs.
+    """
+
+    def stratified_nodes() -> Any:
+        """
+        Returns a adjacency dictionary of only the z-floor level just below origin.
+        """
+        return {z: {ix for ix, v in enumerate(V) if v[-1] == z} for z in sorted({vert[2] for vert in V}) if abs(z) != z}
+
+    def filter_graph(nodes: NodeSet) -> NodesMap:
+        """
+        Create graph with only the nodes in nodes.
+        """
+        return {V[k]: {V[n] for n in v & nodes} for k, v in A.items() if k in nodes}
+
+    def vectorize_A() -> AdjDictVect:
+        """
+        Turn the adjacency from nodes to vectors:
+        {1: {2...}} -> {(-1, 1, 1): {(1, 1, 1)...}}
+        """
+        return {V[node]: {V[n] for n in neighbors} for node, neighbors in A.items()}
+
+    ZA = {level: filter_graph(nodes) if level == -1 else len(nodes) for level, nodes in stratified_nodes().items()}
+    AV = vectorize_A()
+    return AV, ZA
+
+
 @profile()
-def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: GLvls) -> Solution:
+def weave_solution(A: AdjDict, EA: EAdj, W: Weights, ZA: GLvls) -> Solution:
     """
     Solves the hamiltonian cycle problem in discocube graphs deterministically using divide and conquer (non-recursive) and in linear time (the time it takes grows to solve the problem grows linearly to the size of the input) . Uses the weaving process as inspiration and metaphor for the algorithmic design and process.
     1. Spin yarn: create an initial hamiltonian path from the node furthest from the origin to the origin
@@ -21,7 +51,6 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
     It returns a path representing Hamiltonian cycle on a discocube graph.
     This algorithm can also be used on diamond-shaped hexagonal prismatic honeycombs which can be accessed by the ORD = 4620
 
-    Vector version (using vectors instead of nodes (indices of vectors)) doesn't make it any faster.
     AdjDict = Dict[int, Set[int]]: Adjacency list of index representation of vectors in the list V.
     Verts = Tuple[Tuple[int, int, int]]: Tuple of vectors.
     IdxMap = Dict[Any, int]: Maps vectors to their indices to avoid costly index lookups.
@@ -111,7 +140,7 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
         spool = spin()
         for z, zorder in ZA.items():
             woven = set()
-            yarn = [VI[(*xy, z)] for xy in spool[z % 4][-len(zorder) if z == -1 else -zorder:]]
+            yarn = [(*xy, z) for xy in spool[z % 4][-len(zorder) if z == -1 else -zorder:]]
             warps = cut(yarn, bobbins) if bobbins else [yarn]
             for thread in loom:
                 for ix, warp in enumerate(warps):
@@ -126,7 +155,7 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
             loom.extend((deque(warp) for warp in (w for ix, w in enumerate(warps) if ix not in woven)))
             bobbins = {*wind_bobbins(loom)} if z != -1 else None
         for w in loom:
-            w += [VI[(vector := V[node])[0], vector[1], -vector[2]] for node in reversed(w)]
+            w += [(vector[0], vector[1], -vector[2]) for vector in reversed(w)]
         return {idx: Loop(warp) for idx, warp in enumerate(sorted(loom))}
 
     def spin() -> Spool:
@@ -143,7 +172,7 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
         warp_length = len(ZA[-1]) - 1
         for _ in range(warp_length):
             spool.append(sorted(ZA[-1][spool[-1]] - {*spool}, key=lambda n: W[n])[-1])
-        return {3: (red := [V[node][:2] for node in spool]),
+        return {3: (red := [v[:2] for v in spool]),
                 1: np.add(np.dot(np.array(red), [[-1, 0], [0, -1]])[-ZA[-3]:], [0, 2])}
 
     def cut(tour: Path, subset: NodeSet) -> Paths:
@@ -195,7 +224,7 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
                 prev = ix
         return [tour if tour[0] in subset else tour[::-1] for tour in subtours if tour]
 
-    def wind_bobbins(loom: Loom) -> NodeSet:
+    def wind_bobbins(loom) -> NodeSet:
         """
         returns a set of bobbins. it sets the bobbins for the next level by adding the upper and lower neighbors of the first and last element
         of each thread in the loom. The method iterates over the threads in the loom and adds the upper and lower
@@ -204,7 +233,7 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
         bobbins: NodeSet = set()
         for thread in loom:
             for end in ends:
-                bobbins.add(upper := VI[(vector := V[thread[end]])[0], vector[1], vector[2] + 2])
+                bobbins.add(upper := ((vect := thread[end])[0], vect[1], vect[2] + 2))
                 if not end:
                     thread.appendleft(upper)
                 else:
@@ -215,7 +244,7 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
 
 
 def main():
-    from utils import get_G, id_seq, uon
+    from easy_dc.utils import get_G, id_seq, uon
     uon_range = 79040, 79040
     woven, orders, all_times = None, [], []
     woven = None
@@ -223,18 +252,21 @@ def main():
         ord_times = []
         G = get_G(order)
         A, V, VI, EA, W, ZA = G['A'], G['V'], G['VI'], G['EA'], G['W'], G['ZA']
-        ZA = G['ZA'] = easy_dc.make.stratify_A(A, V)
-        save_G(G)
+        print(W)
+        EA1 = {frozenset([V[n] for n in k]): {frozenset([V[node] for node in val]) for val in values} for k, values in EA.items()}
+        W = {V[k]: v for k, v in W.items()}
+        A, ZA = stratify_A2(A, V)
         for _ in range(100):
             start = time.time()
-            woven = weave_solution(A, V, VI, EA, W, ZA)
+
+            woven = weave_solution(A, V, VI, EA1, W, ZA)
             dur = time.time() - start
             # print(f'⏱️ {dur:.7f} ')
             # print('NONTURNS:', count_nonturns(woven, A, V), '|', 'AXES:', count_axes(woven, V), len(woven))
             ord_times.append(dur)
         all_times.append(min(ord_times))
         orders.append(order / 1000000)
-        print(f'⭕️ {order:>7} | ⏱️ {all_times[-1]:.7f} | "🩺", {len(woven)}/{order}: {id_seq(woven, G["A"])}')
+        print(f'⭕️ {order:>7} | ⏱️ {all_times[-1]:.7f} | "🩺", {len(woven)}/{order}: {id_seq(woven, A)}')
     print(f'orders = {orders}')
     print(f'all_times = {all_times}')
 

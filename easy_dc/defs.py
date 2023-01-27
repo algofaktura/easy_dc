@@ -27,15 +27,17 @@ TYPE DEFINITIONS
 """
 
 AdjDict = Dict[int, Set[int]]
+AdjDictVect = Dict[Tuple[int], Set[Tuple[int]]]
 Ends = Tuple[int]
 Path = List[int]
+Spool = Dict[int, Union[np.ndarray, List[List[int]]]]
 Paths = List[Path]
 Verts = Tuple[Tuple[int, int, int]]
 EAdj = Dict[FrozenSet[int], Set[FrozenSet[int]]]
 Edges = Tuple[Tuple[int, int]]
 IdxMap = Dict[Any, int]
 NodesMap = Dict[int, int]
-GLvls = Dict[int, Dict[str, Any]]
+GLvls = Dict[int, Union[int, Dict[str, Any]]]
 NodeSet = Set[int]
 Cycle = Tuple[int]
 Mapping = Dict[int, int]
@@ -62,6 +64,7 @@ Yarn_Spool = Dict[str, ColoredYarn]
 
 __all__ = [
     'AdjDict',
+    'AdjDictVect',
     'Any',
     'AxisRotations',
     'AxisVectors',
@@ -88,6 +91,7 @@ __all__ = [
     'Paths',
     'QuickSet',
     'Solution',
+    'Spool',
     'Start',
     'UonGen',
     'Union',
