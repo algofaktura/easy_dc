@@ -2,12 +2,11 @@ import numpy as np
 
 from collections import deque
 
-from easy_dc.make import shrink_adjacency
 from easy_dc.defs import *
 from easy_dc.utils.info import id_seq
 from easy_dc.utils.gens import uon
 from easy_dc.utils.decs import profile, time
-from easy_dc.utils.io import get_G, save_G
+from easy_dc.utils.io import get_G
 
 
 @profile()
