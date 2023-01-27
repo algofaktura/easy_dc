@@ -53,9 +53,11 @@ New running times cut down by the introduction of the colored yarns:
 ![Runtimes of each order](imgs/8-2million2.png?raw=true "Runtimes of each order")
 
 
-### solve profile 1373600 vertices:
-![Profile of solve_np](imgs/profile_solve_np2.png?raw=true "Profile of solve_np")
+### solve profile 2997280 vertices:
 ![Profile of solve_np](imgs/profile_2997280.png?raw=true "Profile of solve_np")
+### solve profile 5061680 vertices:
+![Profile of solve_np](imgs/profile_solve_np2.png?raw=true "Profile of solve_np")
+
 
 
 ### digital discocubes
