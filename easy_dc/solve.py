@@ -139,12 +139,17 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
         the hamiltonian path from the largest level in order to produce the longest piece of yarm. If the initial tour came from the least nodes ie.,
         min(vector[2]) it would result in only a tour with four nodes, which is useless in creating other tours.
         """
+        # Spin the thread
         spool = [max(ZA[-1])]
         warp_length = len(ZA[-1]) - 1
         for _ in range(warp_length):
             spool.append(sorted(ZA[-1][spool[-1]] - {*spool}, key=lambda n: W[n])[-1])
-        return {3: (red := [V[node][:2] for node in spool]),
-                1: np.add(np.dot(np.array(red), [[-1, 0], [0, -1]])[-ZA[-3]:], [0, 2])}
+
+        # Return the red and blue colored spool
+        return {
+            3: (red := [V[node][:2] for node in spool]),
+            1: np.add(np.dot(np.array(red), [[-1, 0], [0, -1]])[-ZA[-3]:], [0, 2])
+        }
 
     def cut(tour: Path, subset: NodeSet) -> Paths:
         """
