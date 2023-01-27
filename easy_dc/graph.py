@@ -5,7 +5,8 @@ from more_itertools import chunked
 
 from easy_dc.defs import *
 from easy_dc.xyz import Xy
-from easy_dc.utils import save_G, uon
+from easy_dc.utils import save_G
+from easy_dc.info import edist, uon
 
 
 def make_dcgraph(ORD: int, save: bool = True) -> Graph:
@@ -25,7 +26,8 @@ def make_dcgraph(ORD: int, save: bool = True) -> Graph:
         'OE': cc_oe[1],
         'ZA': stratify_A(A, V)
     }
-    if save: save_G(G)
+    if save:
+        save_G(G)
     return G
 
 
@@ -34,7 +36,7 @@ def make_gridgraph(x: int, y: int, z: Optional[int] = None, save: bool = True) -
     Make a discocube graph.
     """
     ORD = x * y * (z if z else 1)
-    A, E = ae_for_grid(x=x, y=y, z=z)
+    A, E = make_grid_ae(x=x, y=y, z=z)
     V = make_vertices_grid(x, y, z=z)
     G = {
         'ORD': ORD,
@@ -48,7 +50,8 @@ def make_gridgraph(x: int, y: int, z: Optional[int] = None, save: bool = True) -
         'OE': cc_oe[1],
         'ZA': stratify_A(A, V) if z else None
     }
-    if save: save_G(G)
+    if save:
+        save_G(G)
     return G
 
 
@@ -86,13 +89,6 @@ def make_cube(p: Xy = Xy((0, 0, 0))) -> Xy:
     """
     AX: AxisRotations = axis_vectors()
     return Xy([s + AX['z'][k] for k in AX['z'] for s in Xy([Xy(j) + AX['y'][k] for j in Xy([Xy(p) + AX['x'][k] for k in AX['x']]) for k in AX['y']])])
-
-
-def edist(a) -> float:
-    """
-    Calculate the Euclidean distance between point a and the origin (0, 0, 0).
-    """
-    return sum([((0, 0, 0)[idx] - a[idx]) ** 2 for idx in range(len(a))]) ** 0.5
 
 
 def make_vi_map(V: Verts) -> IdxMap:
@@ -187,7 +183,7 @@ def stratify_A(A: AdjDict, V: Verts) -> GLvls:
     return {level: filter_graph(nodes) if level == -1 else len(nodes) for level, nodes in stratified_nodes().items()}
 
 
-def ae_for_grid(x: int = None, y: int = None, z: int = None, both: bool = False) -> Graph:
+def make_grid_ae(x: int = None, y: int = None, z: int = None, both: bool = False) -> Graph:
     """
     Create adjacency and edges dict/list for 2d/3d regular rectangular grids.
 
@@ -243,15 +239,6 @@ def ae_for_grid(x: int = None, y: int = None, z: int = None, both: bool = False)
     return {2: (A, E), 3: (A3, E3)}
 
 
-def get_startpos(screen_size, cell_size, xy) -> Verts:
-    """
-    Calculate the start position based on screen size.
-
-    location on screen to place top-left corner of grid.
-    """
-    return [(screen_size[i] - (xy[i] * cell_size)) // 2 for i in range(2)]
-
-
 def make_vertices_grid(x, y, z: Optional[int] = None, cellsize: int = 2, offset=(0, 0, 0)) -> Verts:
     """
     Makes vertices based on cell size.
@@ -260,3 +247,19 @@ def make_vertices_grid(x, y, z: Optional[int] = None, cellsize: int = 2, offset=
     if not z:
         return [(ix + offset[0], iy + offset[1]) for iy in range(0, y * cellsize, cellsize) for ix in range(0, x * cellsize, cellsize)]
     return [(ix, iy, iz) for iz in range(0, z * cellsize, cellsize) for iy in range(0, y * cellsize, cellsize) for ix in range(0, x * cellsize, cellsize)]
+
+
+def assemble_cycle(x, y, z, snake):
+    #   REMAP SOLVED TO OTHER LVLS AND WEAVE THEM INTO A CYCLE:
+    prev, joined = [], []
+
+    for ix in range(1, z, 2):
+        #   FOR EVERY PAIR: REVERSE SECOND. EXTEND TO FIRST
+        joined = [s + (x * y) * (ix - 1) for s in snake] + [s + (x * y) * ix for s in reversed(snake)]
+
+        #   NEST PREVIOUS LOOP IN CURRENT LOOP
+        joined[1:1] = prev[-1:] + prev[:-1]
+        prev = joined
+
+    #   RETURN JOINED
+    return joined

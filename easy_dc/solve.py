@@ -3,9 +3,11 @@ import numpy as np
 from collections import deque
 from itertools import combinations, pairwise
 
-import easy_dc.make
+from easy_dc.graph import uon, stratify_A
 from easy_dc.defs import *
-from easy_dc.utils import profile, timed, time, count_nonturns, count_axes, save_G  # noqa
+from easy_dc.info import id_seq
+from easy_dc.decorators import profile, time
+from easy_dc.utils import get_G, save_G
 
 
 @profile()
@@ -220,7 +222,6 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
 
 
 def main():
-    from utils import get_G, id_seq, uon
     uon_range = 79040, 79040
     woven, orders, all_times = None, [], []
     woven = None
@@ -228,7 +229,7 @@ def main():
         ord_times = []
         G = get_G(order)
         A, V, VI, EA, W, ZA = G['A'], G['V'], G['VI'], G['EA'], G['W'], G['ZA']
-        ZA = G['ZA'] = easy_dc.make.stratify_A(A, V)
+        ZA = G['ZA'] = stratify_A(A, V)
         save_G(G)
         for _ in range(100):
             start = time.time()

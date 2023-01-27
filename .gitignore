@@ -6,5 +6,5 @@
 /.idea/modules.xml
 /.idea/.gitignore
 /pypyvenv/
-/easy_dc/imgs/txt.py
 /easy_dc/run.py
+/imgs/txt.py
