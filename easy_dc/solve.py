@@ -271,14 +271,14 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
 
 
 def main():
-    uon_range = 32, 79040
+    uon_range = 79040, 79040
     woven, orders, all_times = None, [], []
     woven = None
     for order in uon(*uon_range):
         ord_times = []
         G = get_G(order)
         A, V, VI, EA, W, ZA = G['A'], G['V'], G['VI'], G['EA'], G['W'], G['ZA']
-        for _ in range(1):
+        for _ in range(20):
             start = time.time()
             woven = weave_solution(A, V, VI, EA, W, ZA)
             dur = time.time() - start
