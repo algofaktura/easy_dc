@@ -46,11 +46,11 @@ As the order of the graph increases the number of function calls for each nodes 
 
 New running times cut down by the introduction of the colored yarns:
 
-***after***
-![Runtimes of each order](imgs/8-2million2.png?raw=true "Runtimes of each order")
-
 ***before***
 ![Runtimes of each order](imgs/8-2million.png?raw=true "Runtimes of each order")
+
+***after***
+![Runtimes of each order](imgs/8-2million2.png?raw=true "Runtimes of each order")
 
 
 ### solve profile 1373600 vertices:

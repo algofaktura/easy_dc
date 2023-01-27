@@ -2,6 +2,7 @@ import numpy as np
 
 from collections import deque
 
+from easy_dc import utils
 from easy_dc.defs import *
 from easy_dc.utils.info import id_seq
 from easy_dc.utils.gens import uon
@@ -49,7 +50,6 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
             edges: returns the current loop represented as a set of frozensets of edges.
             eadjs: returns edges parallel to and one unit length distance away from each edge in self.edges.
         """
-
         def __init__(self, loop):
             self.loop: Path = list(loop)
             self.looped = None
@@ -121,10 +121,10 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
         """
         warp = (loom := warp_loom()).pop(0)
         while loom:
-            for ix_weft in loom.keys():
-                if bridge := warp.edges & (weft := loom[ix_weft]).eadjs:
-                    if weft_edges := EA[warp_edge := bridge.pop()] & weft.edges:
-                        warp.join(edge=tuple(warp_edge), oedge=tuple(weft_edges.pop()), other=loom.pop(ix_weft))
+            for ix in loom.keys():
+                if bridge := warp.edges & (weft := loom[ix]).eadjs:
+                    if weft_e := EA[warp_e := bridge.pop()] & weft.edges:
+                        warp.join(edge=tuple(warp_e), oedge=tuple(weft_e.pop()), other=loom.pop(ix))
                         break
         return warp.loop
 
@@ -149,11 +149,8 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
                         for end in ends:
                             if thread[end] == warp[0]:
                                 woven.add(ix)
-                                if end:
-                                    thread.extend(warp[1:])
-                                else:
-                                    thread.extendleft(warp[1:])
-            loom.extend((deque(warp) for warp in (w for ix, w in enumerate(warps) if ix not in woven)))
+                                thread.extend(warp[1:]) if end else thread.extendleft(warp[1:])
+            loom.extend((deque(wp) for wp in (w for ix, w in enumerate(warps) if ix not in woven)))
             bobbins = wind(loom) if z != -1 else None
         for w in loom:
             w += [VI[(vector := V[node])[0], vector[1], -vector[2]] for node in reversed(w)]
@@ -267,23 +264,28 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
 
 
 def main():
-    uon_range = 79040, 79040
+    from easy_dc.make import shrink_adjacency
+    uon_range = 5061680, 5061680
     woven, orders, all_times = None, [], []
     woven = None
     for order in uon(*uon_range):
         ord_times = []
         G = get_G(order)
-        A, V, VI, EA, W, ZA = G['A'], G['V'], G['VI'], G['EA'], G['W'], G['ZA']
-        for _ in range(20):
+        A, V, VI, EA, W = G['A'], G['V'], G['VI'], G['EA'], G['W']
+        ZA = G['ZA'] = shrink_adjacency(A, V)
+        utils.io.save_G(G)
+        for _ in range(1):
             start = time.time()
             woven = weave_solution(A, V, VI, EA, W, ZA)
+            utils.io.picklesave(woven, '/home/rommelo/Repos/easy_dc/easy_dc/data/loop_5million')
             dur = time.time() - start
             print(f'⏱️ {dur:.7f} ')
             # print('NONTURNS:', count_nonturns(woven, A, V), '|', 'AXES:', count_axes(woven, V), len(woven))
             ord_times.append(dur)
         all_times.append(min(ord_times))
         orders.append(order / 1000000)
-        print(f'⭕️ {order:>7} | ⏱️ {all_times[-1]:.7f} | "🩺", {len(woven)}/{order}: {id_seq(woven, G["A"])}')
+        print(
+            f'⭕️ {order:>7} | ⏱️ {all_times[-1]:.7f} | "🩺", {len(woven)}/{order}: {id_seq(woven, G["A"])}')
     print(f'orders = {orders}')
     print(f'all_times = {all_times}')
 
