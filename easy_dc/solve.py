@@ -6,7 +6,7 @@ from itertools import combinations, pairwise
 from easy_dc.make import stratify_A
 from easy_dc.defs import *
 from easy_dc.utils.info import id_seq, uon
-from easy_dc.utils.decorators import profile, time
+from easy_dc.utils.decs import profile, time
 from easy_dc.utils.utils import get_G, save_G
 
 
