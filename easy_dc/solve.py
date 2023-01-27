@@ -283,7 +283,7 @@ def main():
         A, V, VI, EA, W = G['A'], G['V'], G['VI'], G['EA'], G['W']
         ZA = G['ZA'] = shrink_adjacency(A, V)
         save_G(G)
-        for _ in range(20):
+        for _ in range(50):
             start = time.time()
             woven = weave_solution(A, V, VI, EA, W, ZA)
             dur = time.time() - start
