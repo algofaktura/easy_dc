@@ -242,10 +242,9 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
             [134, 177, 179, 300, 343, 452, 491, 588, 623, 708, 739, 812, 839, 900, 923, 972, 991, 1028, 1043, 1068, 1079, 1092, 1099, 1100]
             [140, 185, 187, 314, 359, 474, 515, 618, 655, 746, 779, 858, 887, 954, 979, 1034, 1055, 1098, 1115, 1146, 1159, 1178, 1187, 1196]
         """
-        subtours, prev = [], -1
-        last_idx = len(tour) - 1
+        subtours, prev, last_ix = [], -1, len(tour) - 1
         for e, ix in enumerate(ixs := sorted((tour.index(node) for node in subset))):
-            if e == len(ixs) - 1 and ix != last_idx:
+            if e == len(ixs) - 1 and ix != last_ix:
                 subtours += [tour[prev + 1: ix], tour[ix:]]
             else:
                 subtours += [tour[prev + 1:ix + 1]]
