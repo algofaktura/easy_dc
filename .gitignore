@@ -7,6 +7,6 @@
 /.idea/.gitignore
 /pypyvenv/
 /easy_dc/run.py
-/easy_dc/speed_test.py
+/easy_dc/speedy.py
 /imgs/txt.py
 /.idea/inspectionProfiles/Project_Default.xml
