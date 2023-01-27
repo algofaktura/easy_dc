@@ -248,10 +248,7 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
         last_idx = len(tour) - 1
         for e, ix in enumerate(ixs := sorted((tour.index(node) for node in subset))):
             if e == len(ixs) - 1 and ix != last_idx:
-                if len(t1 := tour[prev + 1: ix]) > 1 or not t1:
-                    subtours += [t1, tour[ix:]]
-                else:
-                    subtours += [tour[prev + 1: ix + 1]]
+                subtours += [tour[prev + 1: ix], tour[ix:]]
             else:
                 subtours += [tour[prev + 1:ix + 1]]
                 prev = ix
@@ -274,15 +271,13 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
 
 
 def main():
-    uon_range = 79040, 79040
+    uon_range = 32, 79040
     woven, orders, all_times = None, [], []
     woven = None
     for order in uon(*uon_range):
         ord_times = []
         G = get_G(order)
-        A, V, VI, EA, W = G['A'], G['V'], G['VI'], G['EA'], G['W']
-        ZA = G['ZA'] = shrink_adjacency(A, V)
-        save_G(G)
+        A, V, VI, EA, W, ZA = G['A'], G['V'], G['VI'], G['EA'], G['W'], G['ZA']
         for _ in range(1):
             start = time.time()
             woven = weave_solution(A, V, VI, EA, W, ZA)
