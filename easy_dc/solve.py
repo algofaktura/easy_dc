@@ -172,13 +172,10 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
 
         Color the natural thread blue by rotating the sequence vectors 180 degrees around the z-axis and displace 1 unit length along the y-axis.
         """
-        # SPIN THE THREAD
         spool = [max(ZA[-1])]
         rest = len(ZA[-1]) - 1
         for _ in range(rest):
             spool.append(sorted(ZA[-1][spool[-1]] - {*spool}, key=lambda n: W[n])[-1])
-
-        # COLOR THE BLUE THREAD AND RETURN THE BLUE AND NATURAL SPOOLS
         return {
             3: (natural := [V[node][:2] for node in spool]),
             1: np.add(np.dot(np.array(natural), [[-1, 0], [0, -1]])[-ZA[-3]:], [0, 2])
