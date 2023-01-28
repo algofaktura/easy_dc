@@ -171,8 +171,7 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
         spool = [max(ZA[-1])]
         to_spin = len(ZA[-1]) - 1
         for _ in range(to_spin):
-            spool.append(sorted(ZA[-1][spool[-1]] - {*spool}, key=lambda n: W[n])[-1])
-
+            spool += sorted(ZA[-1][spool[-1]] - {*spool}, key=lambda n: W[n])[-1:]
         return {
             3: (natural := [V[node][:2] for node in spool]),
             1: np.add(np.dot(np.array(natural), [[-1, 0], [0, -1]])[-ZA[-3]:], [0, 2])
@@ -265,7 +264,7 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
 
 def main():
     from easy_dc.make import shrink_adjacency
-    uon_range = 1373600, 1373600
+    uon_range = 79040, 79040
     woven, orders, all_times = None, [], []
     woven = None
     for order in uon(*uon_range):
@@ -274,7 +273,7 @@ def main():
         A, V, VI, EA, W = G['A'], G['V'], G['VI'], G['EA'], G['W']
         ZA = G['ZA'] = shrink_adjacency(A, V)
         utils.io.save_G(G)
-        for _ in range(10):
+        for _ in range(200):
             start = time.time()
             woven = weave_solution(A, V, VI, EA, W, ZA)
             utils.io.picklesave(woven, '/home/rommelo/Repos/easy_dc/easy_dc/data/loop_5million')
