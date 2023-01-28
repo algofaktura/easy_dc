@@ -70,6 +70,11 @@ As each solution is as unique as a fingerprint, or a diamond it allows one to ha
 ![Discocube 3640 view](imgs/icy_cube2.png?raw=true "icy cube another view")
 *Discocubes as glb, using different mirrored texture yields personalized results and unique reflections meaning each discocube has its own reflection/shadow fingerprint! With millions of combinations available (glass texture/image/color, mirror texture/image/color, edge texture/image/color), the possibilities are endless!*
 
+
+### coming soon...
+![Discocube 3640 view](imgs/comingsoom.png?raw=true "Drawing of the algorithmic process") 
+*I'm currently in the process of illustrating the process of the algorithm. But that's its own process.*
+
 ## Installation
 You can install the package by running: 
 ```

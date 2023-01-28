@@ -10,7 +10,7 @@ from easy_dc.utils.decs import profile, time
 from easy_dc.utils.io import get_G
 
 
-@profile()
+# @profile()
 def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: GLvls) -> Solution:
     """
     Solves the hamiltonian cycle problem in discocube graphs deterministically using divide and conquer (non-recursive) and in linear time (the time it takes grows to solve the problem grows linearly to the size of the input) . Uses the weaving process as inspiration and metaphor for the algorithmic design and process.
@@ -263,28 +263,21 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
 
 
 def main():
-    from easy_dc.make import shrink_adjacency
-    uon_range = 79040, 79040
+    uon_range = 32, 3000000
     woven, orders, all_times = None, [], []
     woven = None
     for order in uon(*uon_range):
         ord_times = []
         G = get_G(order)
-        A, V, VI, EA, W = G['A'], G['V'], G['VI'], G['EA'], G['W']
-        ZA = G['ZA'] = shrink_adjacency(A, V)
-        utils.io.save_G(G)
-        for _ in range(200):
+        for _ in range(20):
             start = time.time()
-            woven = weave_solution(A, V, VI, EA, W, ZA)
-            utils.io.picklesave(woven, '/home/rommelo/Repos/easy_dc/easy_dc/data/loop_5million')
+            woven = weave_solution(G['A'], G['V'], G['VI'], G['EA'], G['W'], G['ZA'])
             dur = time.time() - start
-            print(f'⏱️ {dur:.7f} ')
-            # print('NONTURNS:', count_nonturns(woven, A, V), '|', 'AXES:', count_axes(woven, V), len(woven))
             ord_times.append(dur)
         all_times.append(min(ord_times))
         orders.append(order / 1000000)
-        print(
-            f'⭕️ {order:>7} | ⏱️ {all_times[-1]:.7f} | "🩺", {len(woven)}/{order}: {id_seq(woven, G["A"])}')
+        # print('NONTURNS:', count_nonturns(woven, A, V), '|', 'AXES:', count_axes(woven, V), len(woven))
+        print(f'⭕️ {order:>7} | ⏱️ {all_times[-1]:.7f} | "🩺", {len(woven)}/{order}: {id_seq(woven, G["A"])}')
     print(f'orders = {orders}')
     print(f'all_times = {all_times}')
 
