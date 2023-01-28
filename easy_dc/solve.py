@@ -2,15 +2,14 @@ import numpy as np
 
 from collections import deque
 
-from easy_dc import utils
-from easy_dc.defs import *
-from easy_dc.utils.info import id_seq
-from easy_dc.utils.gens import uon
-from easy_dc.utils.decs import profile, time
-from easy_dc.utils.io import get_G
+from defs import *
+from utils.info import id_seq
+from utils.gens import uon
+from utils.decs import profile, time
+from utils.io import get_G
 
 
-# @profile()
+@profile()
 def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: GLvls) -> Solution:
     """
     Solves the hamiltonian cycle problem in discocube graphs deterministically using divide and conquer (non-recursive) and in linear time (the time it takes grows to solve the problem grows linearly to the size of the input) . Uses the weaving process as inspiration and metaphor for the algorithmic design and process.
@@ -40,7 +39,7 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
         Attributes:
             loop (list): A list of edges that represent the loop.
             looped (list): A copy of the loop attribute to check if the loop has been modified.
-            _eadjs (set): A set of edges that are parallel to and one unit length distance away from each edge in self.edges.
+            _eadjs (set): Set of edges that are parallel to and one unit length away from each edge in self.edges.
 
         Methods:
             join: Rotates the loop according to an edge and extends it to the end.
@@ -61,7 +60,6 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
             The current loop represented as a set of frozensets of edges.
 
             [0, 1, 2, 3] -> {frozenset([0, 1]), frozenset([1, 2]), frozenset([2, 3]), frozenset([3, 0])}
-
             Calculated all the time as the self.loop value constantly changes.
             """
             return {*map(frozenset, zip(self.loop, self.loop[1:] + self.loop[:1]))}
@@ -263,13 +261,13 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
 
 
 def main():
-    uon_range = 32, 3000000
+    uon_range = 32, 32
     woven, orders, all_times = None, [], []
     woven = None
     for order in uon(*uon_range):
         ord_times = []
         G = get_G(order)
-        for _ in range(20):
+        for _ in range(1464):
             start = time.time()
             woven = weave_solution(G['A'], G['V'], G['VI'], G['EA'], G['W'], G['ZA'])
             dur = time.time() - start

@@ -41,6 +41,8 @@ def id_seq(seq, A, show=False) -> str or bool:
     """
     Certify sequence, return sequence type broken, loop, or snake.
     """
+    if any((len({*seq}) != len(A), len(seq) != len(A))):
+        return False
     for s in range(1, len(seq)):
         if seq[s - 1] not in A[seq[s]]:
             return show_broken(seq, A) if show else False
