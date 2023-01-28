@@ -257,7 +257,7 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
         for thread in loom:
             thread.appendleft(left := VI[(v1 := V[thread[0]])[0], v1[1], v1[2] + 2])
             thread.append(right := VI[(v2 := V[thread[-1]])[0], v2[1], v2[2] + 2])
-            bobbins.update((left, right))
+            bobbins |= {left, right}
         return bobbins
 
     return weave()
