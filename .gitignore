@@ -6,9 +6,10 @@
 /.idea/modules.xml
 /.idea/.gitignore
 /pypyvenv/
-/easy_dc/run.py
-/easy_dc/speedy.py
+/easy_dc/data/run.py
+/easy_dc/data/speedy.py
 /imgs/txt.py
 /.idea/inspectionProfiles/Project_Default.xml
 /easy_dc/data/loop_5million.pickle
 /.idea/codeStyles/codeStyleConfig.xml
+/easy_dc/data/
