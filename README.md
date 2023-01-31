@@ -79,7 +79,7 @@ As each solution is as unique as a fingerprint, or a diamond it allows one to ha
 
 ### ps...
 Please note: the hamiltonian cycle produced by this algorithm is the base form, without a high mutation rate. The polished versions available have no nonturns and all their edges are distributed evenly across the three axes.
-The other algorithms I spoke of earlier accomplish that task.
+The other algorithms I spoke of earlier accomplish this task.
 
 ## Installation
 You can install the package by running: 

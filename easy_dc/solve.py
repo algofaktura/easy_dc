@@ -1,4 +1,4 @@
-from itertools import product
+# from itertools import product
 
 import numpy as np
 
@@ -7,7 +7,7 @@ from collections import deque
 from defs import *
 from utils.info import id_seq
 from utils.gens import uon
-from utils.decs import profile, time
+from utils.decs import profile, time    # noqa
 from utils.io import get_G
 
 
@@ -96,6 +96,13 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
             Edges parallel to and one unit length distance away from each edge in self.edges.
 
             Calculate only if the loop value has changed.
+
+            WITHOUT EA:
+            self._eadjs = {
+                eadj
+                for u, p in map(frozenset, zip(self.loop, self.loop[1:] + self.loop[:1]))
+                for eadj in ET & {*map(frozenset, product(A[u] - {p}, A[p] - {u}))}
+            }
             """
             if self.loop != self.looped:
                 self._eadjs = {
@@ -103,12 +110,6 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
                     for edge in map(frozenset, zip(self.loop, self.loop[1:] + self.loop[:1]))
                     for eadj in EA[edge]
                 }
-                #   WITHOUT EA:
-                # self._eadjs = {
-                #     eadj
-                #     for u, p in map(frozenset, zip(self.loop, self.loop[1:] + self.loop[:1]))
-                #     for eadj in ET & {*map(frozenset, product(A[u] - {p}, A[p] - {u}))}
-                # }
                 self.looped = self.loop[:]
             return self._eadjs
 
