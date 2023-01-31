@@ -161,9 +161,9 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
         """
         warp = (loom := warp_loom()).pop(0)
         while loom:
+            if len(loom) == 1:
+                warp.last = True
             for ix in loom.keys():
-                if len(loom) == 1:
-                    warp.last = True
                 if bridge := warp.edges & loom[ix].eadjs:
                     if weft_e := EA[warp_e := bridge.pop()] & loom[ix].edges:
                         warp.join(edge=tuple(warp_e), oedge=tuple(weft_e.pop()), other=loom.pop(ix))
