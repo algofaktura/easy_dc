@@ -77,6 +77,10 @@ As each solution is as unique as a fingerprint, or a diamond it allows one to ha
 ![Discocube 3640 view](imgs/comingsoom.png?raw=true "Drawing of the algorithmic process") 
 *I'm currently in the process of illustrating the process of the algorithm. But that's its own process.*
 
+### ps...
+Please note: the hamiltonian cycle produced by this algorithm is the base form, without a high mutation rate. The polished versions available have no nonturns and all their edges are distributed evenly across the three axes.
+The other algorithms I spoke of earlier accomplish that task.
+
 ## Installation
 You can install the package by running: 
 ```
