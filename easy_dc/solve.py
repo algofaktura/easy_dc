@@ -12,7 +12,7 @@ from utils.io import get_G
 
 
 # @profile()
-def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: GLvls, ET) -> Solution:
+def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: GLvls) -> Solution:
     """
     Solves the hamiltonian cycle problem in discocube graphs deterministically using divide and conquer (
     non-recursive) and in linear time (the time it takes grows to solve the problem grows linearly to the size of the
@@ -96,6 +96,10 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
             Edges parallel to and one unit length distance away from each edge in self.edges.
 
             Calculate only if the loop value has changed.
+
+            ET NEEDED AS INPUT:
+            ET = set(map(frozenset, G['E']))
+            ET: Optional[FrozenEdges] = None
 
             WITHOUT EA:
             self._eadjs = {
@@ -275,16 +279,15 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
 
 
 def main():
-    uon_range = 32, 2997280
+    uon_range = 79040, 79040
     woven, orders, all_times = None, [], []
     woven = None
     for order in uon(*uon_range):
         ord_times = []
         G = get_G(order)
-        ET = set(map(frozenset, G['E']))
-        for _ in range(10):
+        for _ in range(5):
             start = time.time()
-            woven = weave_solution(G['A'], G['V'], G['VI'], G['EA'], G['W'], G['ZA'], ET)
+            woven = weave_solution(G['A'], G['V'], G['VI'], G['EA'], G['W'], G['ZA'])
             dur = time.time() - start
             ord_times.append(dur)
         all_times.append(min(ord_times))

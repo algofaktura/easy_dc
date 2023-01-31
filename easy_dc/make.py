@@ -67,9 +67,8 @@ def axis_vectors(unit: int = 1) -> AxisVectors:
     Rotation Vectors
     """
     return {
-        x: {
-            f'{x}{s}': Xy([0 if i != idx else 1 * int(f'{s}{unit}') for i in range(3)]) for s in ('+', '-')
-        } for idx, x in enumerate('xyz')
+        x: {f'{x}{s}': Xy([0 if i != idx else 1 * int(f'{s}{unit}') for i in range(3)]) for s in ('+', '-')}
+        for idx, x in enumerate('xyz')
     }
 
 
@@ -84,9 +83,10 @@ def make_vertices(ORD: int) -> Verts:
     for lvl in range(1, ORD_N[ORD]):
         stages[lvl] = {(Xy(vec) + xyz).data for vec in stages[lvl - 1] for xyz in BV}
     V = (
-        p for ve in (
-            tuple(tuple(c) for c in make_cube(p)) for p in set((tuple(v) for vc in list(stages.values()) for v in vc))
-        ) for p in ve
+        p
+        for ve
+        in (tuple(tuple(c) for c in make_cube(p)) for p in set((tuple(v) for vc in list(stages.values()) for v in vc)))
+        for p in ve
     )
     return sorted(set(V), key=lambda x: (edist(x), x[0], x[1], x[2]))
 
@@ -97,9 +97,9 @@ def make_cube(p: Xy = Xy((0, 0, 0))) -> Xy:
     """
     AX: AxisRotations = axis_vectors()
     return Xy([
-        s + AX['z'][k] for k in AX['z'] for s in Xy([
-            Xy(j) + AX['y'][k] for j in Xy([Xy(p) + AX['x'][k] for k in AX['x']]) for k in AX['y']
-        ])
+        s + AX['z'][k]
+        for k in AX['z']
+        for s in Xy([Xy(j) + AX['y'][k] for j in Xy([Xy(p) + AX['x'][k] for k in AX['x']]) for k in AX['y']])
     ])
 
 
@@ -117,9 +117,10 @@ def make_edges(V: Verts, VI: IdxMap, unit: int = 2) -> Edges:
     BV: BasisVectors = basis_vectors(unit=unit)
     VS: QuickSet = make_quickset(V)
     return tuple((
-        (i, VI[e]) for i, n in enumerate(((
-            (Xy(p) + xz).data for xz in BV if VS.issuperset([(Xy(p) + xz).data])
-        ) for p in V)) for e in n
+        (i, VI[e])
+        for i, n
+        in enumerate((((Xy(p) + xz).data for xz in BV if VS.issuperset([(Xy(p) + xz).data])) for p in V))
+        for e in n
     ))
 
 
