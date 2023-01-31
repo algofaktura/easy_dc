@@ -11,7 +11,7 @@ from utils.decs import profile, time    # noqa
 from utils.io import get_G
 
 
-# @profile()
+@profile()
 def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: GLvls) -> Solution:
     """
     Solves the hamiltonian cycle problem in discocube graphs deterministically using divide and conquer (
@@ -279,7 +279,7 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
 
 
 def main():
-    uon_range = 79040, 79040
+    uon_range = 5061680, 5061680
     woven, orders, all_times = None, [], []
     woven = None
     for order in uon(*uon_range):

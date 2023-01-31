@@ -118,8 +118,7 @@ def make_edges(V: Verts, VI: IdxMap, unit: int = 2) -> Edges:
     VS: QuickSet = make_quickset(V)
     return tuple((
         (i, VI[e])
-        for i, n
-        in enumerate((((Xy(p) + xz).data for xz in BV if VS.issuperset([(Xy(p) + xz).data])) for p in V))
+        for i, n in enumerate((((Xy(p) + xz).data for xz in BV if VS.issuperset([(Xy(p) + xz).data])) for p in V))
         for e in n
     ))
 
