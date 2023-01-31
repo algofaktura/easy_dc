@@ -97,16 +97,16 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
 
             Calculate only if the loop value has changed.
 
-            ET NEEDED AS INPUT:
-            ET = set(map(frozenset, G['E']))
-            ET: Optional[FrozenEdges] = None
-
             WITHOUT EA:
-            self._eadjs = {
-                eadj
-                for u, p in map(frozenset, zip(self.loop, self.loop[1:] + self.loop[:1]))
-                for eadj in ET & {*map(frozenset, product(A[u] - {p}, A[p] - {u}))}
-            }
+                ET NEEDED AS INPUT:
+                ET = set(map(frozenset, G['E']))
+                ET: Optional[FrozenEdges] = None
+
+                self._eadjs = {
+                    eadj
+                    for u, p in map(frozenset, zip(self.loop, self.loop[1:] + self.loop[:1]))
+                    for eadj in ET & {*map(frozenset, product(A[u] - {p}, A[p] - {u}))}
+                }
             """
             if self.loop != self.looped:
                 self._eadjs = {
@@ -161,13 +161,13 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
         """
         warp = (loom := warp_loom()).pop(0)
         while loom:
-            if len(loom) == 1:
-                warp.last = True
             for ix in loom.keys():
                 if bridge := warp.edges & loom[ix].eadjs:
                     if weft_e := EA[warp_e := bridge.pop()] & loom[ix].edges:
                         warp.join(edge=tuple(warp_e), oedge=tuple(weft_e.pop()), other=loom.pop(ix))
                         break
+            if len(loom) == 1:
+                warp.last = True
         return warp.loop
 
     def warp_loom() -> WarpedLoom:
@@ -296,6 +296,10 @@ def main():
         print(f'⭕️ {order:>7} | ⏱️ {all_times[-1]:.7f} | "🩺", {len(woven)}/{order}: {id_seq(woven, G["A"])}')
     print(f'orders = {orders}')
     print(f'all_times = {all_times}')
+
+    """
+    saveto: 8-2million2x2.png
+    """
 
 
 if __name__ == '__main__':

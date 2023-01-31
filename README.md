@@ -52,6 +52,8 @@ New running times cut down by the introduction of the colored yarns:
 ***after***
 ![Runtimes of each order](imgs/8-2million2.png?raw=true "Runtimes of each order")
 
+***after after: 2x faster***
+![Runtimes of each order](imgs/8-2million2x2.png?raw=true "Runtimes of each order 2x faster")
 
 ### solve profile 2,997,280 vertices:
 ![Profile of solve_np](imgs/profile_2997280.png?raw=true "Profile of solve_np")
