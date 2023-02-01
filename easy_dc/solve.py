@@ -4,11 +4,11 @@ import numpy as np
 
 from collections import deque
 
-from defs import *
-from utils.info import id_seq
-from utils.gens import uon
-from utils.decs import profile, time    # noqa
-from utils.io import get_G
+from easy_dc.defs import *
+from easy_dc.utils.info import id_seq
+from easy_dc.utils.gens import uon
+from easy_dc.utils.decs import profile, time    # noqa
+from easy_dc.utils.io import get_G
 
 
 @profile()
@@ -99,6 +99,7 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
 
             WITHOUT EA:
                 ET NEEDED AS INPUT:
+                Edges as frozensets in a set vs tuples in a list.
                 ET = set(map(frozenset, G['E']))
                 ET: Optional[FrozenEdges] = None
 
@@ -296,10 +297,6 @@ def main():
         print(f'⭕️ {order:>7} | ⏱️ {all_times[-1]:.7f} | "🩺", {len(woven)}/{order}: {id_seq(woven, G["A"])}')
     print(f'orders = {orders}')
     print(f'all_times = {all_times}')
-
-    """
-    saveto: 8-2million2x2.png
-    """
 
 
 if __name__ == '__main__':

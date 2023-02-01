@@ -83,8 +83,6 @@ def count_nonturns(data: Path, A: AdjDict, V: Verts) -> int:
         o = V[data[0]] if i == len(data) - 1 else V[data[i + 1]]
         if (n[0] - m[0]) * (o[0] - n[0]) + (n[1] - m[1]) * (o[1] - n[1]) + (n[2] - m[2]) * (o[2] - n[2]) > 0:
             count += 1
-    if not count:
-        print('superperfect:', data)
     return count
 
 
