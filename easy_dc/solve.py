@@ -126,10 +126,10 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
                 oedge (tuple): the edge to rotate the other loop to.
                 other (Loop): the other loop to join to this one.
             """
-            self.joined = True
             self.rotate_to_edge(*edge)
             other.rotate_to_edge(*(oedge if oedge[0] in A[edge[-1]] else oedge[::-1]))
             self.loop[len(self.loop):] = other.loop
+            self.joined = True
 
         def rotate_to_edge(self, start: int, end: int):
             """
@@ -279,13 +279,13 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
 
 
 def main():
-    uon_range = 5061680, 5061680
+    uon_range = 10039120, 10039120
     woven, orders, all_times = None, [], []
     woven = None
     for order in uon(*uon_range):
         ord_times = []
         G = get_G(order)
-        for _ in range(5):
+        for _ in range(1):
             start = time.time()
             woven = weave_solution(G['A'], G['V'], G['VI'], G['EA'], G['W'], G['ZA'])
             dur = time.time() - start

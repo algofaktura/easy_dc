@@ -12,8 +12,8 @@ from easy_dc.utils.gens import uon
 def make_dcgraph(ORD: int, save: bool = True) -> Graph:
     """
     Make a discocube graph.
-    """
 
+    """
     G = {
         'ORD': ORD,
         'V': (V := make_vertices(ORD)),
@@ -34,6 +34,7 @@ def make_dcgraph(ORD: int, save: bool = True) -> Graph:
 def make_gridgraph(x: int, y: int, z: Optional[int] = None, save: bool = True) -> Graph:
     """
     Make a discocube graph.
+
     """
     ORD = x * y * (z if z else 1)
     A, E = make_grid_ae(x=x, y=y, z=z)
@@ -58,16 +59,19 @@ def make_gridgraph(x: int, y: int, z: Optional[int] = None, save: bool = True) -
 def basis_vectors(unit: int = 2) -> BasisVectors:
     """
     Cube vectors centered at origin (0, 0, 0) with the edgelength of 2 to avoid floats.
+
+    Args:
+        unit: unit length
     """
     return [Xy([0 if i != idx else 1 * s for i in range(3)]) for idx, x in enumerate('xyz') for s in (unit, -unit)]
 
 
-def axis_vectors(unit: int = 1) -> AxisVectors:
+def axis_vectors(n: int = 1) -> AxisVectors:
     """
     Rotation Vectors
     """
     return {
-        x: {f'{x}{s}': Xy([0 if i != idx else 1 * int(f'{s}{unit}') for i in range(3)]) for s in ('+', '-')}
+        x: {f'{x}{s}': Xy([0 if i != idx else 1 * int(f'{s}{n}') for i in range(3)]) for s in ('+', '-')}
         for idx, x in enumerate('xyz')
     }
 
@@ -78,7 +82,7 @@ def make_vertices(ORD: int) -> Verts:
     """
     OGN: Vector = 0, 0, 0
     BV: BasisVectors = basis_vectors()
-    ORD_N = {order: n + 1 for n, order in enumerate(uon(8, 10_000_000))}
+    ORD_N = {order: n + 1 for n, order in enumerate(uon(8, 10_039_120))}
     stages = {k: set() if k else {OGN} for k in range(ORD_N[ORD])}
     for lvl in range(1, ORD_N[ORD]):
         stages[lvl] = {(Xy(vec) + xyz).data for vec in stages[lvl - 1] for xyz in BV}
