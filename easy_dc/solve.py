@@ -60,8 +60,8 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
             eadjs: returns edges parallel to and one unit length distance away from each edge in self.edges.
         """
 
-        def __init__(self, loop, idx):
-            self.idx = idx
+        def __init__(self, loop, main_loop):
+            self.main_loop = main_loop
             self.loop: Path = list(loop)
             self.joined = False
             self.looped = None
@@ -78,7 +78,7 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
 
             If index == 0, meaning the loop is the main loop (into which all other loops are incorporated)
             """
-            if not self.idx and not self.last:
+            if self.main_loop and not self.last:
                 return {
                     frozenset(self.loop[i - 1:i + 1])
                     for i in range(len(self.loop) - 1)
@@ -179,6 +179,7 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
         Thread the Warp: Join the bobbined yarn to the threads already in the loom.
         Repeat until all the levels are finished.
         Return loom.
+        Results in a 2-factor: a collection of cycles that together contain all the vertices in G.
         """
         bobbins, loom = None, []
         spool = spin()
@@ -197,7 +198,7 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
             bobbins = wind(loom) if z != -1 else None
         for w in loom:
             w += [VI[(vector := V[node])[0], vector[1], -vector[2]] for node in reversed(w)]
-        return {idx: Loop(warp, idx) for idx, warp in enumerate(sorted(loom))}
+        return {idx: Loop(warp, not idx) for idx, warp in enumerate(sorted(loom))}
 
     def spin() -> Spool:
         """
@@ -280,13 +281,13 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
 
 
 def main():
-    uon_range = 10039120, 10039120
+    uon_range = 9120, 9120
     woven, orders, all_times = None, [], []
     woven = None
     for order in uon(*uon_range):
         ord_times = []
         G = get_G(order)
-        for _ in range(1):
+        for _ in range(50):
             start = time.time()
             woven = weave_solution(G['A'], G['V'], G['VI'], G['EA'], G['W'], G['ZA'])
             dur = time.time() - start
@@ -299,5 +300,31 @@ def main():
     print(f'all_times = {all_times}')
 
 
+def find_2_factor(A):
+    # keep track of visited vertices
+    visited = set()
+    # keep track of edges in the 2-factor
+    edges = []
+
+    # DFS helper function
+    def dfs(node, prev=None):
+        visited.add(node)
+        for neighbor in A[node]:
+            if neighbor not in visited:
+                edges.append((node, neighbor))
+                dfs(neighbor, node)
+            elif neighbor != prev:
+                edges.append((node, neighbor))
+
+    for node in A:
+        if node not in visited:
+            dfs(node)
+
+    return edges
+
+
 if __name__ == '__main__':
-    main()
+    # main()
+    g = get_G(32)
+    a = g['A']
+    print(a)
