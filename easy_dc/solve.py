@@ -300,31 +300,5 @@ def main():
     print(f'all_times = {all_times}')
 
 
-def find_2_factor(A):
-    # keep track of visited vertices
-    visited = set()
-    # keep track of edges in the 2-factor
-    edges = []
-
-    # DFS helper function
-    def dfs(node, prev=None):
-        visited.add(node)
-        for neighbor in A[node]:
-            if neighbor not in visited:
-                edges.append((node, neighbor))
-                dfs(neighbor, node)
-            elif neighbor != prev:
-                edges.append((node, neighbor))
-
-    for node in A:
-        if node not in visited:
-            dfs(node)
-
-    return edges
-
-
 if __name__ == '__main__':
-    # main()
-    g = get_G(32)
-    a = g['A']
-    print(a)
+    main()

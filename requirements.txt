@@ -1,2 +1,5 @@
 numpy~=1.23.5
 setuptools~=65.5.1
+google~=3.0.0
+matplotlib~=3.6.2
+scikit-learn~=1.2.0
