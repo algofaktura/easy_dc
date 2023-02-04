@@ -88,7 +88,6 @@ TYPE DEFINITIONS
 
 AdjDict = Dict[int, Set[int]]
 AdjDictVect = Dict[Tuple[int], Set[Tuple[int]]]
-Ends = Tuple[int]
 Path = List[int]
 Spool = Dict[int, Union[np.ndarray, List[List[int]]]]
 Paths = List[Path]
@@ -134,7 +133,6 @@ __all__ = [
     'Cycle',
     'Edges',
     'EAdj',
-    'Ends',
     'FrozenEdges',
     'FP_GRAPHS',
     'Graph',

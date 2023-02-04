@@ -60,7 +60,7 @@ New running times cut down by the introduction of the colored yarns:
 ***I've managed to speed it up even more: Twice the speed!***
 ![Profile of solve_np](imgs/profile_2997280faster.png?raw=true "Profile of solve_np")
 ### solve profile 5,061,680 vertices:
-![Profile of solve_np](imgs/profile_solve_np2.png?raw=true "Profile of solve_np")
+![Profile of solve_np](imgs/profile_solve_np5.png?raw=true "Profile of solve_np")
 ### solve profile 10,039,120 vertices:
 ![Profile of solve_np](imgs/profile_10.png?raw=true "Profile of solve_np")
 

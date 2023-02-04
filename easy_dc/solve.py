@@ -7,7 +7,7 @@ from collections import deque
 from easy_dc.defs import *
 from easy_dc.utils.info import id_seq
 from easy_dc.utils.gens import uon
-from easy_dc.utils.decs import profile, time    # noqa
+from easy_dc.utils.decs import profile, time  # noqa
 from easy_dc.utils.io import get_G
 
 
@@ -33,69 +33,78 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
     Vector version (using vectors instead of nodes (indices of vectors)) doesn't make it any faster.
     AdjDict = Dict[int, Set[int]]: Adjacency list of index representation of vectors in the list V.
     Verts = Tuple[Tuple[int, int, int]]: Tuple of vectors.
-    IdxMap = Dict[Any, int]: Maps vectors to their indices to avoid costly index lookups.
+    idxMap = Dict[Any, int]: Maps vectors to their indices to avoid costly index lookups.
     EAdj = Dict[FrozenSet[int], Set[FrozenSet[int]]]: Adjacent edges of an edge, ie., parallel to the key edge and 1
     unit length distance away.
     Weights = Dict[int, Union[int, float]]: Weights for each node based on their accretion level.
     GLvls = Dict[int, Dict[str, Any]]: The adjacency dictionary partitioned according to their x value, so that they
     are planes of x, y.
     """
-    ends: Ends = 0, -1
 
     class Loop:
         """
-        Loop Class for representing a loop of edges.
+        Loop Class for representing a data of edges.
 
         Attributes:
-            loop (list): A list of edges that represent the loop.
-            looped (list): A copy of the loop attribute to check if the loop has been modified.
+            data (list): A list of edges that represent the data.
+            prev (list): A copy of the data attribute to check if the data has been modified.
             _eadjs (set): Set of edges that are parallel to and one unit length away from each edge in self.edges.
 
         Methods:
-            join: Rotates the loop according to an edge and extends it to the end.
-            rotate_to_edge: Rotates the loop so that the edge matches the ends of the loop.
+            join: Rotates the data according to an edge and extends it to the end.
+            rotate_to_edge: Rotates the data so that the edge matches the ends of the data.
 
         Properties:
-            edges: returns the current loop represented as a set of frozensets of edges.
+            edges: returns the current data represented as a set of frozensets of edges.
             eadjs: returns edges parallel to and one unit length distance away from each edge in self.edges.
         """
 
-        def __init__(self, loop, main_loop):
-            self.main_loop = main_loop
-            self.loop: Path = list(loop)
+        def __init__(self, data, lead_loop=None):
             self.joined = False
-            self.looped = None
+            self.lead_loop = lead_loop
+            self.data: Path = list(data)
+            self.prev = None
             self._eadjs = None
             self.last = False
 
         @property
         def edges(self):
             """
-            The current loop represented as a set of frozensets of edges.
+            The current data represented as a set of frozensets of edges.
 
             [0, 1, 2, 3] -> {frozenset([0, 1]), frozenset([1, 2]), frozenset([2, 3]), frozenset([3, 0])}
-            Calculated all the time as the self.loop value constantly changes.
+            Calculated all the time as the self.data value constantly changes.
 
-            If index == 0, meaning the loop is the main loop (into which all other loops are incorporated)
+            If index == 0, meaning the data is the main data (into which all other loops are incorporated)
             """
-            if self.main_loop and not self.last:
+            if not self.lead_loop and not self.last:
                 return {
-                    frozenset(self.loop[i - 1:i + 1])
-                    for i in range(len(self.loop) - 1)
+                    frozenset(self.data[i - 1:i + 1])
+                    for i in range(len(self.data) - 1)
                     if self.joined and
-                    1 == V[self.loop[i - 1]][0] == V[self.loop[i - 1]][1] == V[self.loop[i]][0] == V[self.loop[i]][1]
+                    1 == V[self.data[i - 1]][0] == V[self.data[i - 1]][1] == V[self.data[i]][0] == V[self.data[i]][1]
                     or not self.joined and
-                    3 == V[self.loop[i - 1]][0] == V[self.loop[i]][0] and
-                    1 == V[self.loop[i - 1]][1] == V[self.loop[i]][1]
+                    3 == V[self.data[i - 1]][0] == V[self.data[i]][0] and
+                    1 == V[self.data[i - 1]][1] == V[self.data[i]][1]
                 }
-            return {*map(frozenset, zip(self.loop, self.loop[1:] + self.loop[:1]))}
+            elif self.lead_loop and not self.lead_loop.last:
+                return {
+                    frozenset(self.data[i - 1:i + 1])
+                    for i in range(len(self.data) - 1)
+                    if self.lead_loop.joined and
+                    3 == V[self.data[i - 1]][0] == V[self.data[i]][0] and
+                    1 == V[self.data[i - 1]][1] == V[self.data[i]][1]
+                    or not self.lead_loop.joined and
+                    1 == V[self.data[i - 1]][0] == V[self.data[i - 1]][1] == V[self.data[i]][0] == V[self.data[i]][1]
+                }
+            return {*map(frozenset, zip(self.data, self.data[1:] + self.data[:1]))}
 
         @property
         def eadjs(self) -> FrozenEdges:
             """
             Edges parallel to and one unit length distance away from each edge in self.edges.
 
-            Calculate only if the loop value has changed.
+            Calculate only if the data value has changed.
 
             WITHOUT EA:
                 ET NEEDED AS INPUT:
@@ -105,49 +114,49 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
 
                 self._eadjs = {
                     eadj
-                    for u, p in map(frozenset, zip(self.loop, self.loop[1:] + self.loop[:1]))
+                    for u, p in map(frozenset, zip(self.data, self.data[1:] + self.data[:1]))
                     for eadj in ET & {*map(frozenset, product(A[u] - {p}, A[p] - {u}))}
                 }
             """
-            if self.loop != self.looped:
+            if self.data != self.prev:
                 self._eadjs = {
                     eadj
-                    for edge in map(frozenset, zip(self.loop, self.loop[1:] + self.loop[:1]))
+                    for edge in map(frozenset, zip(self.data, self.data[1:] + self.data[:1]))
                     for eadj in EA[edge]
                 }
-                self.looped = self.loop[:]
+                self.prev = self.data[:]
             return self._eadjs
 
         def join(self, edge=None, oedge=None, other=None):
             """
-            Rotates the loop according to an edge and extends it to the end.
+            Rotates the data according to an edge and extends it to the end.
 
             Args:
-                edge (tuple): the edge to rotate the loop to.
-                oedge (tuple): the edge to rotate the other loop to.
-                other (Loop): the other loop to join to this one.
+                edge (tuple): the edge to rotate the data to.
+                oedge (tuple): the edge to rotate the other data to.
+                other (Loop): the other data to join to this one.
             """
             self.rotate_to_edge(*edge)
             other.rotate_to_edge(*(oedge if oedge[0] in A[edge[-1]] else oedge[::-1]))
-            self.loop[len(self.loop):] = other.loop
+            self.data[len(self.data):] = other.data
             self.joined = True
 
-        def rotate_to_edge(self, start: int, end: int):
+        def rotate_to_edge(self, left: int, right: int):
             """
-            Rotates the loop so that the edge matches the ends of the loop.
+            Rotates the data so that the edge matches the ends of the data.
 
             Edge (1, 7) -> Loop (1, 3, 4, 5, 6, 2, 7)
 
             Args:
-                start (int): the starting vertex of the edge.
-                end (int): the ending vertex of the edge.
+                left (int): the starting vertex of the edge.
+                right (int): the ending vertex of the edge.
             """
-            if start == self.loop[-1] and end == self.loop[0]:
-                self.loop[:] = self.loop[::-1]
-            elif (ix_start := self.loop.index(start)) > (ix_end := self.loop.index(end)):
-                self.loop[:] = self.loop[ix_start:] + self.loop[:ix_start]
+            if left == self.data[-1] and right == self.data[0]:
+                self.data[:] = self.data[::-1]
+            elif (idx_left := self.data.index(left)) > (idx_right := self.data.index(right)):
+                self.data[:] = self.data[idx_left:] + self.data[:idx_left]
             else:
-                self.loop[:] = self.loop[ix_end - 1::-1] + self.loop[:ix_end - 1:-1]
+                self.data[:] = self.data[idx_right - 1::-1] + self.data[:idx_right - 1:-1]
 
     def weave() -> Solution:
         """
@@ -160,16 +169,18 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
             540_200  ->  37
             762_272  ->  42
         """
-        warp = (loom := warp_loom()).pop(0)
+        warp, *wefts = warp_loom()
+        warp = Loop(warp)
+        loom = {idx: Loop(weft, lead_loop=warp) for idx, weft in enumerate(wefts)}
         while loom:
-            for ix in loom.keys():
-                if bridge := warp.edges & loom[ix].eadjs:
-                    if weft_e := EA[warp_e := bridge.pop()] & loom[ix].edges:
-                        warp.join(edge=tuple(warp_e), oedge=tuple(weft_e.pop()), other=loom.pop(ix))
+            for idx in loom.keys():
+                if bridge := warp.edges & loom[idx].eadjs:
+                    if weft_e := EA[warp_e := bridge.pop()] & loom[idx].edges:
+                        warp.join(edge=tuple(warp_e), oedge=tuple(weft_e.pop()), other=loom.pop(idx))
                         break
             if len(loom) == 1:
                 warp.last = True
-        return warp.loop
+        return warp.data
 
     def warp_loom() -> WarpedLoom:
         """
@@ -188,17 +199,17 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
             yarn = [VI[(*xy, z)] for xy in spool[z % 4][-len(zorder) if z == -1 else -zorder:]]
             warps = cut(yarn, bobbins) if bobbins else [yarn]
             for thread in loom:
-                for ix, warp in enumerate(warps):
-                    if ix not in woven:
-                        for end in ends:
+                for idx, warp in enumerate(warps):
+                    if idx not in woven:
+                        for end in 0, -1:
                             if thread[end] == warp[0]:
-                                woven.add(ix)
+                                woven.add(idx)
                                 thread.extend(warp[1:]) if end else thread.extendleft(warp[1:])
-            loom.extend((deque(wp) for wp in (w for ix, w in enumerate(warps) if ix not in woven)))
+            loom.extend((deque(wp) for wp in (w for idx, w in enumerate(warps) if idx not in woven)))
             bobbins = wind(loom) if z != -1 else None
         for w in loom:
             w += [VI[(vector := V[node])[0], vector[1], -vector[2]] for node in reversed(w)]
-        return {idx: Loop(warp, not idx) for idx, warp in enumerate(sorted(loom))}
+        return sorted(loom)
 
     def spin() -> Spool:
         """
@@ -254,13 +265,13 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
             For each r in R, r is a sublist of S and is either a subset of T or its complement set (S-T)
             For each r in R, if the first element of r is not in T, then r is in reverse order.
         """
-        subtours, prev, last_ix = [], -1, len(tour) - 1
-        for e, ix in enumerate(ixs := sorted((tour.index(node) for node in subset))):
-            if e == len(ixs) - 1 and ix != last_ix:
-                subtours += [tour[prev + 1: ix], tour[ix:]]
+        subtours, prev, last_idx = [], -1, len(tour) - 1
+        for e, idx in enumerate(idxs := sorted((tour.index(node) for node in subset))):
+            if e == len(idxs) - 1 and idx != last_idx:
+                subtours += [tour[prev + 1: idx], tour[idx:]]
             else:
-                subtours += [tour[prev + 1:ix + 1]]
-                prev = ix
+                subtours += [tour[prev + 1:idx + 1]]
+                prev = idx
         return [tour if tour[0] in subset else tour[::-1] for tour in subtours if tour]
 
     def wind(loom: Loom) -> NodeSet:
@@ -281,13 +292,16 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
 
 
 def main():
-    uon_range = 9120, 9120
+    uon_range = 12320, 12320
     woven, orders, all_times = None, [], []
     woven = None
     for order in uon(*uon_range):
         ord_times = []
+        start = time.time()
         G = get_G(order)
-        for _ in range(50):
+        dur = time.time() - start
+        print(dur)
+        for _ in range(10):
             start = time.time()
             woven = weave_solution(G['A'], G['V'], G['VI'], G['EA'], G['W'], G['ZA'])
             dur = time.time() - start
