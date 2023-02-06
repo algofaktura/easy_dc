@@ -9,7 +9,7 @@ from easy_dc.utils.decs import profile, time  # noqa
 from easy_dc.utils.io import get_G
 
 
-# @profile()
+@profile()
 def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: GLvls) -> Solution:
     """
     Solves the hamiltonian cycle problem in discocube graphs deterministically using divide and conquer (
@@ -293,7 +293,7 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
 
 
 def main():
-    uon_range = 1373600, 1373600
+    uon_range = 10039120, 10039120
     woven, orders, all_times = None, [], []
     woven = None
     for order in uon(*uon_range):
@@ -302,14 +302,13 @@ def main():
         G = get_G(order)
         dur = time.time() - start
         print(dur)
-        for _ in range(10):
+        for _ in range(1):
             start = time.time()
             woven = weave_solution(G['A'], G['V'], G['VI'], G['EA'], G['W'], G['ZA'])
             dur = time.time() - start
             ord_times.append(dur)
         all_times.append(min(ord_times))
         orders.append(order / 1000000)
-        # print('NONTURNS:', count_nonturns(woven, A, V), '|', 'AXES:', count_axes(woven, V), len(woven))
         print(f'⭕️ {order:>7} | ⏱️ {all_times[-1]:.7f} | "🩺", {len(woven)}/{order}: {id_seq(woven, G["A"])}')
     print(f'orders = {orders}')
     print(f'all_times = {all_times}')
