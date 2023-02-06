@@ -1,5 +1,3 @@
-# from itertools import product
-
 import numpy as np
 
 from collections import deque
@@ -59,9 +57,9 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
             eadjs: returns edges parallel to and one unit length distance away from each edge in self.edges.
         """
 
-        def __init__(self, data, lead_loop=None):
+        def __init__(self, data, lead_loop: Optional['Loop'] = None):
             self.joined = False
-            self.lead_loop = lead_loop
+            self.lead_loop: Optional['Loop'] = lead_loop
             self.data: Path = list(data)
             self.prev = None
             self._eadjs = None
@@ -76,8 +74,10 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
             Calculated all the time as the self.data value constantly changes.
 
             If index == 0, meaning the data is the main data (into which all other loops are incorporated)
+
+            Edges that are relevant that are those that are in the center, the conditions are laid out below:
             """
-            if not self.lead_loop and not self.last:
+            if self.lead_loop is None and not self.last:
                 return {
                     frozenset(self.data[i - 1:i + 1])
                     for i in range(len(self.data) - 1)
@@ -87,17 +87,24 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
                     3 == V[self.data[i - 1]][0] == V[self.data[i]][0] and
                     1 == V[self.data[i - 1]][1] == V[self.data[i]][1]
                 }
-            elif self.lead_loop and not self.lead_loop.last:
+            elif self.lead_loop is not None and not self.lead_loop.last:
                 return {
                     frozenset(self.data[i - 1:i + 1])
-                    for i in range(len(self.data) - 1)
+                    for i in range(len(self.data))
                     if self.lead_loop.joined and
                     3 == V[self.data[i - 1]][0] == V[self.data[i]][0] and
                     1 == V[self.data[i - 1]][1] == V[self.data[i]][1]
                     or not self.lead_loop.joined and
                     1 == V[self.data[i - 1]][0] == V[self.data[i - 1]][1] == V[self.data[i]][0] == V[self.data[i]][1]
                 }
-            return {*map(frozenset, zip(self.data, self.data[1:] + self.data[:1]))}
+            return {
+                frozenset(self.data[i - 1:i + 1])
+                for i in range(len(self.data))
+                if 3 == V[self.data[i - 1]][1] == V[self.data[i]][1] and self.lead_loop is not None or
+                1 == V[self.data[i - 1]][1] == V[self.data[i]][1] and self.lead_loop is None or
+                1 == V[self.data[i - 1]][0] or 3 == V[self.data[i - 1]][0] or
+                1 == V[self.data[i]][0] or 3 == V[self.data[i]][0]
+            }
 
         @property
         def eadjs(self) -> FrozenEdges:
@@ -118,14 +125,7 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
                     for eadj in ET & {*map(frozenset, product(A[u] - {p}, A[p] - {u}))}
                 }
             """
-            if self.data != self.prev:
-                self._eadjs = {
-                    eadj
-                    for edge in map(frozenset, zip(self.data, self.data[1:] + self.data[:1]))
-                    for eadj in EA[edge]
-                }
-                self.prev = self.data[:]
-            return self._eadjs
+            return {eadj for edge in self.edges for eadj in EA[edge]}
 
         def join(self, edge=None, oedge=None, other=None):
             """
@@ -172,14 +172,15 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
         warp, *wefts = warp_loom()
         warp = Loop(warp)
         loom = {idx: Loop(weft, lead_loop=warp) for idx, weft in enumerate(wefts)}
+        last_idx = len(loom) - 1
         while loom:
             for idx in loom.keys():
+                if idx == last_idx:
+                    warp.last = True
                 if bridge := warp.edges & loom[idx].eadjs:
                     if weft_e := EA[warp_e := bridge.pop()] & loom[idx].edges:
                         warp.join(edge=tuple(warp_e), oedge=tuple(weft_e.pop()), other=loom.pop(idx))
                         break
-            if len(loom) == 1:
-                warp.last = True
         return warp.data
 
     def warp_loom() -> WarpedLoom:
@@ -292,7 +293,7 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
 
 
 def main():
-    uon_range = 12320, 12320
+    uon_range = 79040, 79040
     woven, orders, all_times = None, [], []
     woven = None
     for order in uon(*uon_range):
@@ -301,7 +302,7 @@ def main():
         G = get_G(order)
         dur = time.time() - start
         print(dur)
-        for _ in range(10):
+        for _ in range(1):
             start = time.time()
             woven = weave_solution(G['A'], G['V'], G['VI'], G['EA'], G['W'], G['ZA'])
             dur = time.time() - start

@@ -298,3 +298,7 @@ def assemble_cycle(x, y, z, snake):
 
     #   RETURN JOINED
     return joined
+
+
+if __name__ == '__main__':
+    print(make_dcgraph(32))
