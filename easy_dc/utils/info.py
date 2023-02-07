@@ -4,8 +4,10 @@ from easy_dc.defs import *
 def absumv(n, V):
     """
     Get the accretion level of an point in a 3d grid graph.
+    It is an abbreviation of the manhattan distance between the current point and the origin (0, 0, 0):
+        |x - 0| + |y - 0| + |z - 0| = |x| + |y| + |z| => sum(map(abs, V[n]))
     """
-    return sum(map(abs, V[n]))
+    return sum(map(abs, V[n])) 
 
 
 def edist(a) -> float:
