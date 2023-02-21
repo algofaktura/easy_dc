@@ -1,12 +1,8 @@
 import numpy as np
-
 from collections import deque
 
 from defs import *
-from utils.info import id_seq
-from utils.gens import uon
-from utils.decs import profile, time
-from utils.io import get_G
+from utils.decs import profile
 
 
 @profile()
@@ -338,21 +334,23 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
 
 
 def main():
-    uon_range = 79040, 79040
+    from utils import info, gens, decs, io
+    uon_range = 160, 160
     woven, orders, all_times = None, [], []
     woven = None
-    for order in uon(*uon_range):
+    for order in gens.uon(*uon_range):
         ord_times = []
-        G = get_G(order)
+        G = io.get_G(order)
         for _ in range(1):
-            start = time.time()
+            start = decs.time.time()
             woven = weave_solution(G['A'], G['V'], G['VI'], G['EA'], G['W'], G['ZA'])
-            dur = time.time() - start
+            print(woven)
+            dur = decs.time.time() - start
             ord_times.append(dur)
         all_times.append(min(ord_times))
         orders.append(order / 1000000)
         # print('NONTURNS:', count_nonturns(woven, A, V), '|', 'AXES:', count_axes(woven, V), len(woven))
-        print(f'⭕️ {order:>7} | ⏱️ {all_times[-1]:.7f} | "🩺", {len(woven)}/{order}: {id_seq(woven, G["A"])}')
+        print(f'⭕️ {order:>7} | ⏱️ {all_times[-1]:.7f} | "🩺", {len(woven)}/{order}: {info.id_seq(woven, G["A"])}')
     print(f'orders = {orders}')
     print(f'all_times = {all_times}')
 

@@ -1,5 +1,5 @@
 from collections import deque
-from typing import Deque
+from typing import Deque, Tuple
 
 from easy_dc.utils import *
 
@@ -209,25 +209,3 @@ def weave_discocube(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj) -> Cycle:
     for tw in to_weave:
         print(tw, id_seq(tw, A))
     return weave(to_weave).pop()
-
-
-if __name__ == '__main__':
-    graph_fp = '/mnt/a9f6bede-6105-4049-a22d-aeb740b1e684/graphs_discocube/'
-    uon_range = 2027680, 2027680
-    orders = list(uon(*uon_range))
-    times = []
-    degrees = []
-    for order in uon(*uon_range):
-        G = pickleload(os.path.join(graph_fp, str(order)))
-        A, V, VI, E, EA = G['A'], G['V'], G['VI'], G['E'], G['EA']
-        start = time.time()
-        woven = weave_discocube(A, V, VI, EA)
-        dur = time.time() - start
-        print('SOLUTION:', len(woven), id_seq(woven, A))
-        print(woven)
-        print(f'DURATION: {dur}')
-        print(f'ORDER: {order} | NODES PER MILLISECOND: {(dur / order) * 1000}')
-        degrees.append(len([n for n in A if len(A[n]) == 6]) / order)
-        times.append(dur)
-    print(orders, times)
-    plot_curve_with_regression(sizes=orders, times=times)
