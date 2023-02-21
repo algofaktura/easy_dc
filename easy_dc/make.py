@@ -6,12 +6,6 @@ from more_itertools import chunked
 from easy_dc.defs import *
 from easy_dc.utils.io import save_G
 from easy_dc.utils.info import edist
-from easy_dc.utils.gens import uon
-
-from easy_dc.utils.decs import timed
-
-
-ORD_N = {order: n + 1 for n, order in enumerate(uon(8, 10_039_120))}
 
 
 def make_dcgraph(ORD: int, save: bool = True) -> Graph:
@@ -71,46 +65,47 @@ def basis_vectors(unit: int = 2) -> BasisVectors:
     return [Xy([0 if i != idx else 1 * s for i in range(3)]) for idx, x in enumerate('xyz') for s in (unit, -unit)]
 
 
-def axis_vectors(n: int = 1) -> AxisVectors:
-    """
-    Rotation Vectors
-    """
-    return {
-        x: {f'{x}{s}': Xy([0 if i != idx else 1 * int(f'{s}{n}') for i in range(3)]) for s in ('+', '-')}
-        for idx, x in enumerate('xyz')
-    }
-
-
-OGN: Vector = 0, 0, 0
-BV: BasisVectors = basis_vectors()
-
-
-def make_vertices_old(ORD: int) -> Verts:
-    """
-    Vertices from the order.
-    """
-    stages = {k: set() if k else {OGN} for k in range(ORD_N[ORD])}
-    for lvl in range(1, ORD_N[ORD]):
-        stages[lvl] = {(Xy(vec) + xyz).data for vec in stages[lvl - 1] for xyz in BV}
-    V = (
-        p
-        for ve
-        in (tuple(tuple(c) for c in make_cube(p)) for p in set((tuple(v) for vc in list(stages.values()) for v in vc)))
-        for p in ve
-    )
-    return sorted(set(V), key=lambda x: (edist(x), x[0], x[1], x[2]))
-
-
-def make_cube(p: Xy = Xy((0, 0, 0))) -> Xy:
-    """
-    From an origin point, create a cube consisting of 8 corners (vertices).
-    """
-    AX: AxisRotations = axis_vectors()
-    return Xy([
-        s + AX['z'][k]
-        for k in AX['z']
-        for s in Xy([Xy(j) + AX['y'][k] for j in Xy([Xy(p) + AX['x'][k] for k in AX['x']]) for k in AX['y']])
-    ])
+#
+# def axis_vectors(n: int = 1) -> AxisVectors:
+#     """
+#     Rotation Vectors
+#     """
+#     return {
+#         x: {f'{x}{s}': Xy([0 if i != idx else 1 * int(f'{s}{n}') for i in range(3)]) for s in ('+', '-')}
+#         for idx, x in enumerate('xyz')
+#     }
+#
+#   OLD VERTICES:
+# OGN: Vector = 0, 0, 0
+# BV: BasisVectors = basis_vectors()
+#
+#
+# def make_vertices_old(ORD: int) -> Verts:
+#     """
+#     Vertices from the order.
+#     """
+#     stages = {k: set() if k else {OGN} for k in range(ORD_N[ORD])}
+#     for lvl in range(1, ORD_N[ORD]):
+#         stages[lvl] = {(Xy(vec) + xyz).data for vec in stages[lvl - 1] for xyz in BV}
+#     V = (
+#         p
+#         for ve
+#         in (tuple(tuple(c) for c in make_cube(p)) for p in set((tuple(v) for vc in list(stages.values()) for v in vc)))
+#         for p in ve
+#     )
+#     return sorted(set(V), key=lambda x: (edist(x), x[0], x[1], x[2]))
+#
+#
+# def make_cube(p: Xy = Xy((0, 0, 0))) -> Xy:
+#     """
+#     From an origin point, create a cube consisting of 8 corners (vertices).
+#     """
+#     AX: AxisRotations = axis_vectors()
+#     return Xy([
+#         s + AX['z'][k]
+#         for k in AX['z']
+#         for s in Xy([Xy(j) + AX['y'][k] for j in Xy([Xy(p) + AX['x'][k] for k in AX['x']]) for k in AX['y']])
+#     ])
 
 
 def absumv(v):
@@ -125,7 +120,7 @@ def make_vertices(ORD: int = 8) -> Verts:
     Quick vert maker
     8 = 1 level
     """
-    max_xyz = ORD_N[ORD] * 2 - 1
+    max_xyz = next(filter(lambda n: ORD == round((4 / 3) * (n + 2) * (n + 1) * n), range(ORD // 4))) * 2 - 1
     return sorted(
         filter(lambda p: absumv(p) < (max_xyz + 4), product(range(-max_xyz, max_xyz + 1, 2), repeat=3)),
         key=lambda x: (edist(x), x[0], x[1], x[2])
@@ -139,7 +134,6 @@ def make_vi_map(V: Verts) -> IdxMap:
     return dict(zip(V, range(len(V))))
 
 
-@timed
 def make_edges(V: Verts, VI: Optional[IdxMap] = None, unit: int = 2) -> Edges:
     """
     Make edges from verts and vert mapping
