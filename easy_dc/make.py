@@ -1,5 +1,5 @@
 from collections import defaultdict
-from itertools import product, chain, repeat
+from itertools import product, chain, repeat, combinations
 
 from more_itertools import chunked
 
@@ -7,6 +7,11 @@ from easy_dc.defs import *
 from easy_dc.utils.io import save_G
 from easy_dc.utils.info import edist
 from easy_dc.utils.gens import uon
+
+from easy_dc.utils.decs import timed
+
+
+ORD_N = {order: n + 1 for n, order in enumerate(uon(8, 10_039_120))}
 
 
 def make_dcgraph(ORD: int, save: bool = True) -> Graph:
@@ -76,13 +81,14 @@ def axis_vectors(n: int = 1) -> AxisVectors:
     }
 
 
-def make_vertices(ORD: int) -> Verts:
+OGN: Vector = 0, 0, 0
+BV: BasisVectors = basis_vectors()
+
+
+def make_vertices_old(ORD: int) -> Verts:
     """
     Vertices from the order.
     """
-    OGN: Vector = 0, 0, 0
-    BV: BasisVectors = basis_vectors()
-    ORD_N = {order: n + 1 for n, order in enumerate(uon(8, 10_039_120))}
     stages = {k: set() if k else {OGN} for k in range(ORD_N[ORD])}
     for lvl in range(1, ORD_N[ORD]):
         stages[lvl] = {(Xy(vec) + xyz).data for vec in stages[lvl - 1] for xyz in BV}
@@ -107,6 +113,22 @@ def make_cube(p: Xy = Xy((0, 0, 0))) -> Xy:
     ])
 
 
+def absumv(v):
+    """
+    Returns the manhattan distance of v to origin.
+    """
+    return sum(map(abs, v))
+
+
+def make_vertices(ORD: int = 8) -> Verts:
+    """
+    Quick vert maker
+    8 = 1 level
+    """
+    max_xyz = ORD_N[ORD] * 2 - 1
+    return sorted(filter(lambda p: absumv(p) < (max_xyz + 4), product(range(-max_xyz, max_xyz + 1, 2), repeat=3)), key=lambda x: (edist(x), x[0], x[1], x[2]))
+
+
 def make_vi_map(V: Verts) -> IdxMap:
     """
     Make a mapping of key: data to value: idx_vert to avoid costly index lookups.
@@ -114,10 +136,12 @@ def make_vi_map(V: Verts) -> IdxMap:
     return dict(zip(V, range(len(V))))
 
 
-def make_edges(V: Verts, VI: IdxMap, unit: int = 2) -> Edges:
+@timed
+def make_edges(V: Verts, VI: Optional[IdxMap] = None, unit: int = 2) -> Edges:
     """
     Make edges from verts and vert mapping
     """
+    VI = VI or make_vi_map(V)
     BV: BasisVectors = basis_vectors(unit=unit)
     VS: QuickSet = make_quickset(V)
     return tuple((
@@ -300,5 +324,8 @@ def assemble_cycle(x, y, z, snake):
     return joined
 
 
-if __name__ == '__main__':
-    print(make_dcgraph(32))
+def find_edges(vertices):
+    """
+    Alternate expression for make_edges but so much slower.
+    """
+    return {frozenset((i, j)) for i, j in filter(lambda pair: sum((vertices[pair[0]][k] - vertices[pair[1]][k])**2 for k in range(3)) == 4, combinations(range(len(vertices)), 2))}
