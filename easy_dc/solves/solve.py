@@ -1,7 +1,7 @@
 from collections import deque
-from typing import Deque, Tuple
+from typing import Deque, Tuple, List
 
-from easy_dc.utils import *
+from easy_dc.defs import *
 
 
 def stratify_A(A: AdjDict, V: Verts) -> GLvls:
@@ -206,6 +206,4 @@ def weave_discocube(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj) -> Cycle:
                             warp.join(edge=tuple(edge), oedge=tuple(other_edges.pop()), other=other)
         return [warp.data for warp in warps if not warp.set]
     to_weave = list((s for s in sorted(set_loom(), key=len, reverse=True)))
-    for tw in to_weave:
-        print(tw, id_seq(tw, A))
     return weave(to_weave).pop()

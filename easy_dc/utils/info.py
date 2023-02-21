@@ -1,6 +1,10 @@
 from easy_dc.defs import *
 
 
+def get_uon(n: int):
+    return round((4 / 3) * (n + 2) * (n + 1) * n)
+
+
 def absumv(n, V):
     """
     Get the accretion level of an point in a 3d grid graph.

@@ -126,7 +126,10 @@ def make_vertices(ORD: int = 8) -> Verts:
     8 = 1 level
     """
     max_xyz = ORD_N[ORD] * 2 - 1
-    return sorted(filter(lambda p: absumv(p) < (max_xyz + 4), product(range(-max_xyz, max_xyz + 1, 2), repeat=3)), key=lambda x: (edist(x), x[0], x[1], x[2]))
+    return sorted(
+        filter(lambda p: absumv(p) < (max_xyz + 4), product(range(-max_xyz, max_xyz + 1, 2), repeat=3)),
+        key=lambda x: (edist(x), x[0], x[1], x[2])
+    )
 
 
 def make_vi_map(V: Verts) -> IdxMap:
@@ -156,6 +159,20 @@ def make_quickset(to_set: Iterable) -> QuickSet:
     Convert an iterable into a set to perform quick set operations.
     """
     return set(map(tuple, to_set))
+
+
+def make_edges2(vertices):
+    """
+    Alternate expression for make_edges but so much slower.
+    """
+    return {
+        frozenset((i, j))
+        for i, j
+        in filter(
+            lambda pair: sum((vertices[pair[0]][k] - vertices[pair[1]][k])**2 for k in range(3)) == 4,
+            combinations(range(len(vertices)), 2)
+        )
+    }
 
 
 def make_adjacency(edges: Edges) -> AdjDict:
@@ -322,10 +339,3 @@ def assemble_cycle(x, y, z, snake):
 
     #   RETURN JOINED
     return joined
-
-
-def find_edges(vertices):
-    """
-    Alternate expression for make_edges but so much slower.
-    """
-    return {frozenset((i, j)) for i, j in filter(lambda pair: sum((vertices[pair[0]][k] - vertices[pair[1]][k])**2 for k in range(3)) == 4, combinations(range(len(vertices)), 2))}

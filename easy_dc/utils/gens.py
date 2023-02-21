@@ -12,11 +12,11 @@ def unpack(nested_list) -> Unpacker:
             yield nested
 
 
-def uon(start=8, end=3000000, n=800) -> UonGen:
+def uon(start=8, end=3000000, max_n=800) -> UonGen:
     """
     Generator for the uncentered octahedral numbers.
     """
-    for i in range(n + 2):
-        _uon = sum([(n * (n + 2)) for n in range(0, n * 2 + 2, 2)][:i])
+    for i in range(max_n + 2):
+        _uon = sum([(n * (n + 2)) for n in range(0, max_n * 2 + 2, 2)][:i])
         if end >= _uon >= start:
             yield _uon
