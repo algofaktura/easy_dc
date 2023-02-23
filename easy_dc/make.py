@@ -120,7 +120,7 @@ def make_vertices(ORD: int = 8) -> Verts:
     Quick vert maker
     8 = 1 level
     """
-    max_xyz = next(filter(lambda n: ORD == round((4 / 3) * (n + 2) * (n + 1) * n), range(ORD // 4))) * 2 - 1
+    max_xyz = next(filter(lambda n: round((4 / 3) * (n + 2) * (n + 1) * n) == ORD, range(ORD // 4))) * 2 - 1
     return sorted(
         filter(lambda p: absumv(p) < (max_xyz + 4), product(range(-max_xyz, max_xyz + 1, 2), repeat=3)),
         key=lambda x: (edist(x), x[0], x[1], x[2])
