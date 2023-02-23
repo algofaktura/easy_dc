@@ -34,7 +34,7 @@ def times(fn, n=10):
     return inner
 
 
-@times(100000)
+@times(10000000)
 def cut(tour, subset):
     """
     This function takes in two inputs: a list called `tour` and a set called `subset`. It returns a list of lists.
