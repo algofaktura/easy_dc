@@ -5,7 +5,7 @@ from defs import *
 from utils.decs import profile
 
 
-@profile()
+# @profile()
 def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: GLvls) -> Solution:
     """
     Solves the hamiltonian cycle problem in discocube graphs deterministically using divide and conquer (
@@ -172,12 +172,6 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
                 oedge (tuple): the edge to rotate the other data to.
                 other (Loop): the other data to join to this one.
             """
-            print(
-                edge,
-                [V[e] for e in edge],
-                (oe := oedge if oedge[0] in A[edge[-1]] else oedge[::-1]),
-                [V[o] for o in oe]
-            )
             self.joined = True
             self.rotate_to_edge(*edge)
             other.rotate_to_edge(*(oedge if oedge[0] in A[edge[-1]] else oedge[::-1]))
@@ -335,19 +329,19 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
 
 def main():
     from utils import info, gens, decs, io
-    uon_range = 160, 160
+    uon_range = tuple([16192] * 2)
     woven, orders, all_times = None, [], []
     woven = None
     for order in gens.uon(*uon_range):
         ord_times = []
         G = io.get_G(order)
-        for _ in range(1):
+        for _ in range(1000):
             start = decs.time.time()
             woven = weave_solution(G['A'], G['V'], G['VI'], G['EA'], G['W'], G['ZA'])
-            print(woven)
             dur = decs.time.time() - start
             ord_times.append(dur)
-        all_times.append(min(ord_times))
+        # print(woven)
+        all_times.append(sum(ord_times))
         orders.append(order / 1000000)
         # print('NONTURNS:', count_nonturns(woven, A, V), '|', 'AXES:', count_axes(woven, V), len(woven))
         print(f'⭕️ {order:>7} | ⏱️ {all_times[-1]:.7f} | "🩺", {len(woven)}/{order}: {info.id_seq(woven, G["A"])}')

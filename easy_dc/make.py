@@ -199,6 +199,27 @@ def make_edges_adjacency(A: AdjDict, E: Edges) -> EAdj:
     return {frozenset((u, p)): et & {*map(frozenset, product(A[u] - {p}, A[p] - {u}))} for u, p in et}
 
 
+def make_ead(A: dict[int, set[int]], E: set[tuple[int, int]]) -> dict[tuple[int, int], set[tuple[int, int]]]:
+    """
+    Creates an adjacency for a 3d square grid graph
+    where:
+        keys -> all edges in E
+        key -> edge
+        values -> are edges which are adjacent to the edge_key
+    where:
+        for each edge (m, n) in E:
+            m < n.
+
+    edge (m, n) is adjacent to edge (o, p)
+        if:
+            (m is adjacent to o and n is adjacent to p)
+            or
+            (m is adjacent to p and n is adjacent to o)
+        where m < n and o < p.
+    """
+    return {(c, d): {((m, n) if m < n else (n, m)) for m, n in E & set(product(A[c] - {d}, A[d] - {c}))} for c, d in E}
+
+
 def make_coloring(A: AdjDict = None, both: bool = False, oddeven: bool = False) -> Union[Mapping, NodesGroup]:
     """
     Returns a dict mapping a node to its chromatic coloring.
@@ -333,3 +354,4 @@ def assemble_cycle(x, y, z, snake):
 
     #   RETURN JOINED
     return joined
+
