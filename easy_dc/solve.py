@@ -329,13 +329,13 @@ def weave_solution(A: AdjDict, V: Verts, VI: IdxMap, EA: EAdj, W: Weights, ZA: G
 
 def main():
     from utils import info, gens, decs, io
-    uon_range = tuple([16192] * 2)
+    uon_range = tuple([10640] * 2)
     woven, orders, all_times = None, [], []
     woven = None
     for order in gens.uon(*uon_range):
         ord_times = []
         G = io.get_G(order)
-        for _ in range(1000):
+        for _ in range(10):
             start = decs.time.time()
             woven = weave_solution(G['A'], G['V'], G['VI'], G['EA'], G['W'], G['ZA'])
             dur = decs.time.time() - start

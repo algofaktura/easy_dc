@@ -8,11 +8,13 @@ An algorithm for solving the Hamiltonian cycle problem deterministically and in 
 ![First 11 discocubes and their order (number of nodes)](imgs/rect5857.png?raw=true "Discocubes orders")
 *The first eleven discocubes and their respective orders (number of nodes)*
 
-Finding the solution to the problem reminded me of macramé, of tying knots, weaving and how repeating certain movements resulted in certain patterns. I followed the thought further and asked myself if there was a 'weave' I could use to expose underlying unit structure and repeat this throughout to get an initial solution which could later be mutated to produce a more polished solution. 
+Why weave()> Finding the solution to the problem reminded me of macramé, of tying knots, weaving and how repeating certain movements resulted in certain patterns. I followed the thought further and asked myself if there was a 'weave' I could use to expose underlying unit structure and repeat this throughout to get an initial solution which could later be mutated to produce a more polished solution. 
 
 The focus of this work is to apply all that I know about this graph, not as a discrete mathematician, but as an artists with an eye towards visual aesthetics. Inspiration was the driving force behind the work (a bit of obsession I confess). 
 
-From expressing the desire to sculpt a 3-dimensional contour drawing of an object to reformulating this desire mathematically as searching for a Hamiltonian cycle in specific yet unidentified graph, sketches are indistinguishable from mini algorithms.  An artist uses language and forms that language to communicate their vision to others, taking part in a process of translation from one medium to another, from vision to object, from words to movement, just as a programmer might transform ideas into an orchestra of processing with the perfect score.
+From expressing the desire to sculpt a 3-dimensional contour drawing of an object to reformulating this desire mathematically as searching for a Hamiltonian cycle in specific yet unidentified graph, where sketches are indistinguishable from mini algorithms.  An artist uses language and forms that language to communicate their vision to others, taking part in a process of translation from one medium to another, from vision to object, from words to movement, just as a programmer might transform ideas into an orchestra of processing with the perfect score.
+
+Or an artwork can be a result of an internal algorithm in which ideas and inspirations are mapped to a graph from which a hamiltonian cycle is found, an object connecting the points of ideas together into one unified, cyclical whole.
 
 This is a tiny result of that artistic investigative process and I hope it will be useful. I've grown so obsessed with the discocube object, really not unlike an obsessive artist's muse to the point of being a stalker. 
 
